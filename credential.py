@@ -12,3 +12,15 @@ class Credential():
     def get_telegram_token(self):
         return self.obj["telegram_api_token"]
 
+    def get_username(self):
+        return self.obj["username"]
+
+    def get_password(self):
+        return self.obj["password"]
+
+    def get_database_name(self):
+        return self.obj["database_name"]
+
+    def get_conn_uri(self):
+        return "postgresql://%s:%s@127.0.0.1:5432/%s" %(self.get_username(), self.get_password(), self.get_database_name())
+
