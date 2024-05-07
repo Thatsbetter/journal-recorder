@@ -49,4 +49,4 @@ def handle_voice(message):
         bot.reply_to(message, f"Oops, something went wrong: {e}")
 
 
-bot.polling()
+bot.infinity_polling(interval=0)
