@@ -3,7 +3,7 @@ from datetime import datetime
 import os
 import shutil
 from tempfile import NamedTemporaryFile
-
+import logging
 import ffmpeg
 import requests
 from sqlalchemy import create_engine, Column, Integer, Text, DateTime
@@ -14,7 +14,8 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from transformers import pipeline
 
 from credential import Credential
-
+logging.basicConfig(filename='error.log', level=logging.ERROR,
+                    format='%(asctime)s:%(levelname)s:%(message)s')
 Base = declarative_base()
 transcriber = pipeline(model="openai/whisper-small")
 TOKEN = Credential().get_telegram_token()
@@ -106,7 +107,6 @@ def handle_voice(message):
 
 @bot.callback_query_handler(func=lambda call:True)
 def handle_query(call):
-    print(call)
     if call.data == "cancel":
         # Notify user of cancellation
         bot.send_message(chat_id=call.message.chat.id,
@@ -128,7 +128,7 @@ def handle_query(call):
             bot.send_message(chat_id=call.message.chat.id,
                              text="Thank you for sharing your thoughts! It has been saved.")
         except Exception as e:
-            bot.reply_to(call.message, f"Oops, something went wrong: {e}")
+            logging.error(f"Error handling query: {str(e)}")
 
 
 bot.infinity_polling(interval=0)
