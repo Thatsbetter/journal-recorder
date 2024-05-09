@@ -9,6 +9,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 import telebot
 from transformers import pipeline
+from tempfile import NamedTemporaryFile
+import shutil
+
 
 from credential import Credential
 
@@ -43,18 +46,23 @@ def save_journal_entry(chat_id, text):
 
 
 def save_and_convert_audio(file_id):
-    # Fetch file using Telegram's API
     file_info = bot.get_file(file_id)
-    file = requests.get('https://api.telegram.org/file/bot{0}/{1}'.format(TOKEN, file_info.file_path))
+    file_response = requests.get('https://api.telegram.org/file/bot{0}/{1}'.format(TOKEN, file_info.file_path),
+                                 stream=True)
 
-    # Save the OGG file temporarily
-    with open('temp_voice.ogg', 'wb') as f:
-        f.write(file.content)
+    with NamedTemporaryFile(delete=False, suffix='.ogg') as temp_file:
+        shutil.copyfileobj(file_response.raw, temp_file)
 
-    # Convert OGG to MP3 using ffmpeg (as a more compatible format for many systems)
-    ffmpeg.input('temp_voice.ogg').output('temp_voice.mp3').run(overwrite_output=True)
+    path_to_ogg = temp_file.name
+    path_to_mp3 = path_to_ogg.replace('.ogg', '.mp3')
 
-    return 'temp_voice.mp3'
+    # Convert OGG to MP3 using ffmpeg
+    ffmpeg.input(path_to_ogg).output(path_to_mp3).run(overwrite_output=True)
+
+    # Clean up the original OGG file
+    os.remove(path_to_ogg)
+
+    return path_to_mp3
 
 
 def transcribe_audio(path_to_audio):
@@ -74,7 +82,7 @@ def handle_voice(message):
         save_journal_entry(message.chat.id, transcription)
 
         # Send the transcription back to the user
-        bot.reply_to(message, f"Transcribed text: {transcription}")
+        bot.reply_to(message, f"Thank you for sharing your thoughts! \n It has been saved.")
 
     except Exception as e:
         bot.reply_to(message, f"Oops, something went wrong: {e}")
