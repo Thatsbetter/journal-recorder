@@ -1,3 +1,4 @@
 /credential.json
 *.mp3
 *.ogg
+/credential-server.json
