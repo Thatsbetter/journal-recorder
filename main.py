@@ -124,11 +124,11 @@ def handle_query(call):
             save_journal_entry(call.message.chat.id, transcription)
 
             # Respond to the user
-            bot.answer_callback_query(call.id, "Entry saved successfully!")
             bot.send_message(chat_id=call.message.chat.id,
                              text="Thank you for sharing your thoughts! It has been saved.")
         except Exception as e:
             logging.error(f"Error handling query: {str(e)}")
+            bot.answer_callback_query(call.id, "Failed to save you journal.")
 
 
 bot.infinity_polling(interval=0)
