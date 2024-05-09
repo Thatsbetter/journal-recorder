@@ -1,17 +1,17 @@
 # Bot token from BotFather
 from datetime import datetime
 import os
+import shutil
+from tempfile import NamedTemporaryFile
 
 import ffmpeg
 import requests
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime
+from sqlalchemy import create_engine, Column, Integer, Text, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 import telebot
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from transformers import pipeline
-from tempfile import NamedTemporaryFile
-import shutil
-
 
 from credential import Credential
 
@@ -32,7 +32,11 @@ class JournalEntry(Base):
     chat_id = Column(Integer, nullable=False)
     text = Column(Text, nullable=False)
     timestamp = Column(DateTime, default=datetime.utcnow)
-
+class FileId(Base):
+    __tablename__ = 'file_id'
+    id = Column(Integer, primary_key=True)
+    message_id = Column(Integer, nullable=False)
+    file_id = Column(Text, nullable=False)
 
 Base.metadata.create_all(engine)
 
@@ -43,6 +47,18 @@ def save_journal_entry(chat_id, text):
         new_entry = JournalEntry(chat_id=chat_id, text=text)
         session.add(new_entry)
         session.commit()
+
+def save_file_id(message_id,file_id):
+    with Session() as session:
+        new_file_id = FileId(message_id=message_id,file_id=file_id)
+        session.add(new_file_id)
+        session.commit()
+
+def get_file_id(message_id):
+    # get file_id with this message_id
+    with Session() as session:
+        file_association = session.query(FileId).filter_by(message_id=message_id).first()
+        return file_association.file_id if file_association else None
 
 
 def save_and_convert_audio(file_id):
@@ -73,19 +89,46 @@ def transcribe_audio(path_to_audio):
 
 @bot.message_handler(content_types=['voice'])
 def handle_voice(message):
-    try:
-        # Save and convert the received voice message
-        path_to_mp3 = save_and_convert_audio(message.voice.file_id)
+    markup = InlineKeyboardMarkup()
+    markup.row_width = 2
+    confirm_save = message.message_id
+    cancel_save = "cancel"
+    save_file_id(message_id=message.message_id, file_id=message.voice.file_id)
+    markup.add(InlineKeyboardButton("Okay. Continue", callback_data=confirm_save),
+               InlineKeyboardButton("I wanna try again", callback_data=cancel_save))
+    bot.send_message(
+        chat_id=message.chat.id,
+        text="This Audio will be transcribed and saved to you journal",
+        reply_markup=markup,
+        reply_to_message_id=message.message_id
+    )
 
-        # Transcribe the audio
-        transcription = transcribe_audio(path_to_mp3)
-        save_journal_entry(message.chat.id, transcription)
 
-        # Send the transcription back to the user
-        bot.reply_to(message, f"Thank you for sharing your thoughts! \n It has been saved.")
+@bot.callback_query_handler(func=lambda call:True)
+def handle_query(call):
+    print(call)
+    if call.data == "cancel":
+        # Notify user of cancellation
+        bot.send_message(chat_id=call.message.chat.id,
+                         text="Got it! It won´t be saved. \n You can try again.")
+    else:
+        try:
+            file_id = get_file_id(message_id=call.data)
+            # Process the audio after confirmation
+            path_to_mp3 = save_and_convert_audio(file_id=file_id)
 
-    except Exception as e:
-        bot.reply_to(message, f"Oops, something went wrong: {e}")
+            # Transcribe the audio
+            transcription = transcribe_audio(path_to_mp3)
+
+            # Save the journal entry
+            save_journal_entry(call.message.chat.id, transcription)
+
+            # Respond to the user
+            bot.answer_callback_query(call.id, "Entry saved successfully!")
+            bot.send_message(chat_id=call.message.chat.id,
+                             text="Thank you for sharing your thoughts! It has been saved.")
+        except Exception as e:
+            bot.reply_to(call.message, f"Oops, something went wrong: {e}")
 
 
 bot.infinity_polling(interval=0)
