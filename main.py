@@ -39,6 +39,12 @@ class FileId(Base):
     message_id = Column(Integer, nullable=False)
     file_id = Column(Text, nullable=False)
 
+class TextId(Base):
+    __tablename__ = 'text_id'
+    id = Column(Integer, primary_key=True)
+    message_id = Column(Integer, nullable=False)
+    text = Column(Text, nullable=False)
+
 Base.metadata.create_all(engine)
 
 
@@ -60,6 +66,19 @@ def get_file_id(message_id):
     with Session() as session:
         file_association = session.query(FileId).filter_by(message_id=message_id).first()
         return file_association.file_id if file_association else None
+
+def save_text_id(message_id,text):
+    with Session() as session:
+        new_text_id = TextId(message_id=message_id,text=text)
+        session.add(new_text_id)
+        session.commit()
+
+def get_text_id(message_id):
+    # get text with this message_id
+    with Session() as session:
+        found_text = session.query(TextId).filter_by(message_id=message_id).first()
+        return found_text.text if found_text else None
+
 
 
 def save_and_convert_audio(file_id):
