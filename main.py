@@ -111,14 +111,30 @@ def transcribe_audio(path_to_audio):
 def handle_voice(message):
     markup = InlineKeyboardMarkup()
     markup.row_width = 2
-    confirm_save = message.message_id
-    cancel_save = "cancel"
+    confirm_save = f"confirm_voice:{message.message_id}"
+    cancel_save = "cancel: "
     save_file_id(message_id=message.message_id, file_id=message.voice.file_id)
-    markup.add(InlineKeyboardButton("Okay. Continue", callback_data=confirm_save),
-               InlineKeyboardButton("I wanna try again", callback_data=cancel_save))
+    markup.add(InlineKeyboardButton("Yes", callback_data=confirm_save),
+               InlineKeyboardButton("No, I wanna try again", callback_data=cancel_save))
     bot.send_message(
         chat_id=message.chat.id,
-        text="This Audio will be transcribed and saved to you journal",
+        text="Do you want to add this voice message to your journal?",
+        reply_markup=markup,
+        reply_to_message_id=message.message_id
+    )
+
+@bot.message_handler(content_types=['text'])
+def handle_text(message):
+    markup = InlineKeyboardMarkup()
+    markup.row_width = 2
+    confirm_save = f"confirm_text:{message.message_id}"
+    cancel_save = "cancel: "
+    save_text_id(message_id=message.message_id, text=message.text)
+    markup.add(InlineKeyboardButton("Yes", callback_data=confirm_save),
+               InlineKeyboardButton("No, I wanna try again", callback_data=cancel_save))
+    bot.send_message(
+        chat_id=message.chat.id,
+        text="Do you want to add this text to your journal?",
         reply_markup=markup,
         reply_to_message_id=message.message_id
     )
@@ -126,13 +142,14 @@ def handle_voice(message):
 
 @bot.callback_query_handler(func=lambda call:True)
 def handle_query(call):
-    if call.data == "cancel":
+    split = call.data.split(":")
+    if split[0] == "cancel":
         # Notify user of cancellation
         bot.send_message(chat_id=call.message.chat.id,
                          text="Got it! It won´t be saved. \n You can try again.")
-    else:
+    elif split[0] == "confirm_voice":
         try:
-            file_id = get_file_id(message_id=call.data)
+            file_id = get_file_id(message_id=split[1])
             # Process the audio after confirmation
             path_to_mp3 = save_and_convert_audio(file_id=file_id)
 
@@ -141,6 +158,19 @@ def handle_query(call):
 
             # Save the journal entry
             save_journal_entry(call.message.chat.id, transcription)
+
+            # Respond to the user
+            bot.send_message(chat_id=call.message.chat.id,
+                             text="Thank you for sharing your thoughts! It has been saved.")
+        except Exception as e:
+            logging.error(f"Error handling query: {str(e)}")
+            bot.answer_callback_query(call.id, "Failed to save you journal.")
+    elif split[0] == "confirm_text":
+        try:
+            text = get_text_id(message_id=split[1])
+
+            # Save the journal entry
+            save_journal_entry(call.message.chat.id, text)
 
             # Respond to the user
             bot.send_message(chat_id=call.message.chat.id,
