@@ -12,7 +12,8 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from transformers import pipeline
-
+from text_processing import generate_word_frequencies, create_word_cloud
+from datetime import datetime, timedelta
 from credential import Credential
 logging.basicConfig(filename='error.log', level=logging.ERROR,
                     format='%(asctime)s:%(levelname)s:%(message)s')
@@ -60,6 +61,9 @@ def save_file_id(message_id,file_id):
         new_file_id = FileId(message_id=message_id,file_id=file_id)
         session.add(new_file_id)
         session.commit()
+def fetch_journal_entries(chat_id):
+    with Session() as session:
+        return session.query(JournalEntry.text).filter_by(chat_id=chat_id).all()
 
 def get_file_id(message_id):
     # get file_id with this message_id
@@ -122,7 +126,14 @@ def handle_voice(message):
         reply_markup=markup,
         reply_to_message_id=message.message_id
     )
-
+@bot.message_handler(commands=['show_wordcloud'])
+def send_word_cloud(message):
+    entries = fetch_journal_entries(message.chat.id)
+    complete_text = " ".join([entry.text for entry in entries])
+    word_counts = generate_word_frequencies(complete_text)
+    img = create_word_cloud(word_counts)
+    bot.send_photo(chat_id=message.chat.id, photo=img, caption="Here's your word cloud!")
+    img.close()  # Close the BytesIO object after sending to free memory
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
     markup = InlineKeyboardMarkup()
