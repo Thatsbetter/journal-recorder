@@ -84,6 +84,33 @@ def get_text_id(message_id):
         return found_text.text if found_text else None
 
 
+def send_chunked_message(chat_id, text, max_length=4096):
+    """
+    Send a message in chunks if it exceeds Telegram's maximum message length.
+    Splits the message at line breaks when possible, within the maximum allowed length.
+
+    Args:
+        chat_id (int): Telegram chat ID to send the message to.
+        text (str): Text to be sent.
+        max_length (int): Maximum length of each message chunk. Defaults to 4096.
+    """
+    while len(text) > 0:
+        # Check if the text is within the maximum length
+        if len(text) <= max_length:
+            bot.send_message(chat_id, text)
+            break
+
+        # Find the nearest line break within the maximum length
+        chunk_limit = text.rfind('\n', 0, max_length)
+        if chunk_limit == -1:
+            # No line break found, forced to cut at max_length
+            chunk_limit = max_length
+
+        # Send the current chunk
+        bot.send_message(chat_id, text[:chunk_limit])
+
+        # Remove the sent part from the text
+        text = text[chunk_limit:].lstrip()
 
 def save_and_convert_audio(file_id):
     file_info = bot.get_file(file_id)
@@ -128,7 +155,7 @@ def show_weekly_entries(message):
     entries = fetch_journal_entries_by_week(chat_id)
     if entries:
         response = "\n\n".join([f"{entry[1].strftime('%Y-%m-%d %H:%M:%S')}: {entry[0]}" for entry in entries])
-        bot.send_message(chat_id, f"Here are your journal entries from the past week:\n{response}")
+        send_chunked_message(chat_id, f"Here are your journal entries from the past week:\n{response}")
     else:
         bot.send_message(chat_id, "You have no journal entries from the past week.")
 
@@ -139,7 +166,7 @@ def show_monthly_entries(message):
     entries = fetch_journal_entries_by_week(chat_id, weeks=4)
     if entries:
         response = "\n\n".join([f"{entry[1].strftime('%Y-%m-%d %H:%M:%S')}: {entry[0]}" for entry in entries])
-        bot.send_message(chat_id, f"Here are your journal entries from the past month:\n{response}")
+        send_chunked_message(chat_id, f"Here are your journal entries from the past month:\n{response}")
     else:
         bot.send_message(chat_id, "You have no journal entries from the past month.")
 
@@ -150,7 +177,7 @@ def show_two_month_entries(message):
     entries = fetch_journal_entries_by_month(chat_id, weeks=8)
     if entries:
         response = "\n\n".join([f"{entry[1].strftime('%Y-%m-%d %H:%M:%S')}: {entry[0]}" for entry in entries])
-        bot.send_message(chat_id, f"Here are your journal entries from the past two months:\n{response}")
+        send_chunked_message(chat_id, f"Here are your journal entries from the past two months:\n{response}")
     else:
         bot.send_message(chat_id, "You have no journal entries from the past two months.")
 
