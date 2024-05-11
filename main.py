@@ -12,7 +12,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from transformers import pipeline
-from text_processing import generate_word_frequencies, create_word_cloud
+from text_processing import generate_word_frequencies, create_word_cloud,find_similar_journal_entries
 from datetime import datetime, timedelta
 from credential import Credential
 logging.basicConfig(filename='error.log', level=logging.ERROR,
@@ -224,9 +224,10 @@ def handle_text(message):
 @bot.callback_query_handler(func=lambda call:True)
 def handle_query(call):
     split = call.data.split(":")
+    chat_id = call.message.chat.id
     if split[0] == "cancel":
         # Notify user of cancellation
-        bot.send_message(chat_id=call.message.chat.id,
+        bot.send_message(chat_id=chat_id,
                          text="Got it! It won´t be saved. \n You can try again.")
     elif split[0] == "confirm_voice":
         try:
@@ -238,11 +239,19 @@ def handle_query(call):
             transcription = transcribe_audio(path_to_mp3)
 
             # Save the journal entry
-            save_journal_entry(call.message.chat.id, transcription)
+            save_journal_entry(chat_id, transcription)
 
             # Respond to the user
-            bot.send_message(chat_id=call.message.chat.id,
+            bot.send_message(chat_id=chat_id,
                              text="Thank you for sharing your thoughts! It has been saved.")
+
+            similar_entries = find_similar_journal_entries(fetch_journal_entries_by_week(chat_id,16))
+            if similar_entries:
+                response = "Just so you know, you had similar Thoughts in past 4 Months :\n"
+                for entry, timestamp, score in similar_entries:
+                    date = timestamp.strftime('%Y-%m-%d %H:%M')
+                    response += f"- {date}: {entry} (Score: {score:.2f})\n"
+                send_chunked_message(chat_id, response)
         except Exception as e:
             logging.error(f"Error handling query: {str(e)}")
             bot.answer_callback_query(call.id, "Failed to save you journal.")
@@ -251,11 +260,18 @@ def handle_query(call):
             text = get_text_id(message_id=split[1])
 
             # Save the journal entry
-            save_journal_entry(call.message.chat.id, text)
+            save_journal_entry(chat_id, text)
 
             # Respond to the user
-            bot.send_message(chat_id=call.message.chat.id,
+            bot.send_message(chat_id=chat_id,
                              text="Thank you for sharing your thoughts! It has been saved.")
+            similar_entries = find_similar_journal_entries(fetch_journal_entries_by_week(chat_id, 16))
+            if similar_entries:
+                response = "Just so you know, you had similar Thoughts in past 4 Months :\n \n"
+                for entry, timestamp in similar_entries:
+                    date = timestamp.strftime('%Y-%m-%d %H:%M')
+                    response += f"- {date}: {entry}\n"
+                send_chunked_message(chat_id, response)
         except Exception as e:
             logging.error(f"Error handling query: {str(e)}")
             bot.answer_callback_query(call.id, "Failed to save you journal.")

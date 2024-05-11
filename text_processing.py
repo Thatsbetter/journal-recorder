@@ -7,6 +7,8 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from wordcloud import WordCloud
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 # Ensure consistent language detection results
 DetectorFactory.seed = 0
@@ -53,3 +55,21 @@ def create_word_cloud(word_counts):
     img.seek(0)  # Important: move to the start of the BytesIO object!
 
     return img
+
+def find_similar_journal_entries(entries):
+    # Fetching past journal entries from the database including timestamps
+    texts = [entry[0] for entry in entries]  # Extract text for similarity comparison
+
+    # Compute TF-IDF and cosine similarities
+    vectorizer = TfidfVectorizer()
+    tfidf_matrix = vectorizer.fit_transform(texts)
+    cosine_similarities = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1])
+
+    # Collect all entries with similarity score above a threshold (e.g., 0.45)
+    similar_entries = []
+    threshold = 0.45
+    for idx, similarity in enumerate(cosine_similarities[0]):
+        if similarity >= threshold:
+            # Append both text and timestamp information
+            similar_entries.append((entries[idx][0], entries[idx][1]))
+    return similar_entries
