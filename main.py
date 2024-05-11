@@ -111,6 +111,49 @@ def transcribe_audio(path_to_audio):
     return transcription['text']
 
 
+def fetch_journal_entries_by_week(chat_id,weeks=1):
+    one_week_ago = datetime.utcnow() - timedelta(weeks=weeks)
+    with Session() as session:
+        entries = session.query(JournalEntry).filter(
+            JournalEntry.chat_id == chat_id,
+            JournalEntry.timestamp >= one_week_ago
+        ).all()
+    return [(entry.text, entry.timestamp) for entry in entries]
+
+
+
+@bot.message_handler(commands=['weekly_entries'])
+def show_weekly_entries(message):
+    chat_id = message.chat.id
+    entries = fetch_journal_entries_by_week(chat_id)
+    if entries:
+        response = "\n\n".join([f"{entry[1].strftime('%Y-%m-%d %H:%M:%S')}: {entry[0]}" for entry in entries])
+        bot.send_message(chat_id, f"Here are your journal entries from the past week:\n{response}")
+    else:
+        bot.send_message(chat_id, "You have no journal entries from the past week.")
+
+
+@bot.message_handler(commands=['monthly_entries'])
+def show_monthly_entries(message):
+    chat_id = message.chat.id
+    entries = fetch_journal_entries_by_week(chat_id, weeks=4)
+    if entries:
+        response = "\n\n".join([f"{entry[1].strftime('%Y-%m-%d %H:%M:%S')}: {entry[0]}" for entry in entries])
+        bot.send_message(chat_id, f"Here are your journal entries from the past month:\n{response}")
+    else:
+        bot.send_message(chat_id, "You have no journal entries from the past month.")
+
+
+@bot.message_handler(commands=['two_month_entries'])
+def show_two_month_entries(message):
+    chat_id = message.chat.id
+    entries = fetch_journal_entries_by_month(chat_id, weeks=8)
+    if entries:
+        response = "\n\n".join([f"{entry[1].strftime('%Y-%m-%d %H:%M:%S')}: {entry[0]}" for entry in entries])
+        bot.send_message(chat_id, f"Here are your journal entries from the past two months:\n{response}")
+    else:
+        bot.send_message(chat_id, "You have no journal entries from the past two months.")
+
 @bot.message_handler(content_types=['voice'])
 def handle_voice(message):
     markup = InlineKeyboardMarkup()
