@@ -15,6 +15,8 @@ from transformers import pipeline
 from text_processing import generate_word_frequencies, create_word_cloud,find_similar_journal_entries
 from datetime import datetime, timedelta
 from credential import Credential
+from apscheduler.schedulers.background import BackgroundScheduler
+
 logging.basicConfig(filename='error.log', level=logging.ERROR,
                     format='%(asctime)s:%(levelname)s:%(message)s')
 Base = declarative_base()
@@ -83,6 +85,20 @@ def get_text_id(message_id):
         found_text = session.query(TextId).filter_by(message_id=message_id).first()
         return found_text.text if found_text else None
 
+
+def remind_users_to_journal():
+    try:
+        with Session() as session:
+            chat_ids = session.query(JournalEntry.chat_id).distinct().all()
+
+            for chat_id, in chat_ids:
+                last_entry = session.query(JournalEntry).filter_by(chat_id=chat_id).order_by(
+                    JournalEntry.timestamp.desc()).first()
+                if last_entry is None or (datetime.utcnow() - last_entry.timestamp) > timedelta(days=2):
+                    bot.send_message(chat_id,
+                                     "Hey! You haven't journaled in the last two days. Why not make a new entry today?")
+    except Exception as e:
+        logging.error(f"Failed to send reminder: {e}")
 
 def send_chunked_message(chat_id, text, max_length=4096):
     """
@@ -277,4 +293,16 @@ def handle_query(call):
             bot.answer_callback_query(call.id, "Failed to save you journal.")
 
 
-bot.infinity_polling(interval=0)
+# Initialize scheduler
+scheduler = BackgroundScheduler()
+scheduler.add_job(remind_users_to_journal, 'cron', day_of_week='*', hour=19, minute=0)  # Run daily at 9:00 AM
+scheduler.start()
+
+# Setup polling
+try:
+    bot.polling(none_stop=True, interval=0, timeout=20)
+except Exception as e:
+    logging.error(f"Bot polling failed: {e}")
+finally:
+    # This ensures that the scheduler is properly shut down when the polling loop is stopped
+    scheduler.shutdown()
