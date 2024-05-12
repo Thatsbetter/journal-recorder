@@ -312,7 +312,7 @@ def handle_query(call):
 
 # Initialize scheduler
 scheduler = BackgroundScheduler()
-scheduler.add_job(remind_users_to_journal, 'cron', day_of_week='*', hour=19, minute=0)  # Run daily at 9:00 AM
+scheduler.add_job(remind_users_to_journal, 'cron', day_of_week='*', hour=19, minute=0)  # Run daily at 7:00 PM
 scheduler.start()
 
 # Setup polling
