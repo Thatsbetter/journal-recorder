@@ -1,9 +1,11 @@
 # Bot token from BotFather
-from datetime import datetime
+from datetime import datetime, timedelta
+import logging
 import os
 import shutil
 from tempfile import NamedTemporaryFile
-import logging
+
+from apscheduler.schedulers.background import BackgroundScheduler
 import ffmpeg
 import requests
 from sqlalchemy import create_engine, Column, Integer, Text, DateTime
@@ -12,10 +14,9 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from transformers import pipeline
-from text_processing import generate_word_frequencies, create_word_cloud,find_similar_journal_entries
-from datetime import datetime, timedelta
+
 from credential import Credential
-from apscheduler.schedulers.background import BackgroundScheduler
+from text_processing import generate_word_frequencies, create_word_cloud, find_similar_journal_entries
 
 logging.basicConfig(filename='error.log', level=logging.ERROR,
                     format='%(asctime)s:%(levelname)s:%(message)s')
@@ -36,17 +37,21 @@ class JournalEntry(Base):
     chat_id = Column(Integer, nullable=False)
     text = Column(Text, nullable=False)
     timestamp = Column(DateTime, default=datetime.utcnow)
+
+
 class FileId(Base):
     __tablename__ = 'file_id'
     id = Column(Integer, primary_key=True)
     message_id = Column(Integer, nullable=False)
     file_id = Column(Text, nullable=False)
 
+
 class TextId(Base):
     __tablename__ = 'text_id'
     id = Column(Integer, primary_key=True)
     message_id = Column(Integer, nullable=False)
     text = Column(Text, nullable=False)
+
 
 Base.metadata.create_all(engine)
 
@@ -58,14 +63,18 @@ def save_journal_entry(chat_id, text):
         session.add(new_entry)
         session.commit()
 
-def save_file_id(message_id,file_id):
+
+def save_file_id(message_id, file_id):
     with Session() as session:
-        new_file_id = FileId(message_id=message_id,file_id=file_id)
+        new_file_id = FileId(message_id=message_id, file_id=file_id)
         session.add(new_file_id)
         session.commit()
+
+
 def fetch_journal_entries(chat_id):
     with Session() as session:
         return session.query(JournalEntry.text).filter_by(chat_id=chat_id).all()
+
 
 def get_file_id(message_id):
     # get file_id with this message_id
@@ -73,11 +82,13 @@ def get_file_id(message_id):
         file_association = session.query(FileId).filter_by(message_id=message_id).first()
         return file_association.file_id if file_association else None
 
-def save_text_id(message_id,text):
+
+def save_text_id(message_id, text):
     with Session() as session:
-        new_text_id = TextId(message_id=message_id,text=text)
+        new_text_id = TextId(message_id=message_id, text=text)
         session.add(new_text_id)
         session.commit()
+
 
 def get_text_id(message_id):
     # get text with this message_id
@@ -99,6 +110,7 @@ def remind_users_to_journal():
                                      "Hey! You haven't journaled in the last two days. Why not make a new entry today?")
     except Exception as e:
         logging.error(f"Failed to send reminder: {e}")
+
 
 def send_chunked_message(chat_id, text, max_length=4096):
     """
@@ -128,6 +140,7 @@ def send_chunked_message(chat_id, text, max_length=4096):
         # Remove the sent part from the text
         text = text[chunk_limit:].lstrip()
 
+
 def save_and_convert_audio(file_id):
     file_info = bot.get_file(file_id)
     file_response = requests.get('https://api.telegram.org/file/bot{0}/{1}'.format(TOKEN, file_info.file_path),
@@ -154,7 +167,7 @@ def transcribe_audio(path_to_audio):
     return transcription['text']
 
 
-def fetch_journal_entries_by_week(chat_id,weeks=1):
+def fetch_journal_entries_by_week(chat_id, weeks=1):
     one_week_ago = datetime.utcnow() - timedelta(weeks=weeks)
     with Session() as session:
         entries = session.query(JournalEntry).filter(
@@ -162,7 +175,6 @@ def fetch_journal_entries_by_week(chat_id,weeks=1):
             JournalEntry.timestamp >= one_week_ago
         ).all()
     return [(entry.text, entry.timestamp) for entry in entries]
-
 
 
 @bot.message_handler(commands=['weekly_entries'])
@@ -197,6 +209,7 @@ def show_two_month_entries(message):
     else:
         bot.send_message(chat_id, "You have no journal entries from the past two months.")
 
+
 @bot.message_handler(content_types=['voice'])
 def handle_voice(message):
     markup = InlineKeyboardMarkup()
@@ -212,6 +225,8 @@ def handle_voice(message):
         reply_markup=markup,
         reply_to_message_id=message.message_id
     )
+
+
 @bot.message_handler(commands=['show_wordcloud'])
 def send_word_cloud(message):
     entries = fetch_journal_entries(message.chat.id)
@@ -220,6 +235,8 @@ def send_word_cloud(message):
     img = create_word_cloud(word_counts)
     bot.send_photo(chat_id=message.chat.id, photo=img, caption="Here's your word cloud!")
     img.close()  # Close the BytesIO object after sending to free memory
+
+
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
     markup = InlineKeyboardMarkup()
@@ -237,7 +254,7 @@ def handle_text(message):
     )
 
 
-@bot.callback_query_handler(func=lambda call:True)
+@bot.callback_query_handler(func=lambda call: True)
 def handle_query(call):
     split = call.data.split(":")
     chat_id = call.message.chat.id
@@ -261,7 +278,7 @@ def handle_query(call):
             bot.send_message(chat_id=chat_id,
                              text="Thank you for sharing your thoughts! It has been saved.")
 
-            similar_entries = find_similar_journal_entries(fetch_journal_entries_by_week(chat_id,16))
+            similar_entries = find_similar_journal_entries(fetch_journal_entries_by_week(chat_id, 16))
             if similar_entries:
                 response = "Just so you know, you had similar Thoughts in past 4 Months :\n"
                 for entry, timestamp, score in similar_entries:
