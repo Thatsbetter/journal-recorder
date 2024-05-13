@@ -74,6 +74,9 @@ def fetch_journal_entries(chat_id):
     with Session() as session:
         return session.query(JournalEntry.text).filter_by(chat_id=chat_id).all()
 
+def is_journal_entry_more_than_10(chat_id):
+    with Session() as session:
+        return len(session.query(JournalEntry.text).filter_by(chat_id=chat_id).all()) > 10
 
 def get_file_id(message_id):
     # get file_id with this message_id
@@ -201,17 +204,6 @@ def handle_voice(message):
         reply_to_message_id=message.message_id
     )
 
-
-@bot.message_handler(commands=['show_wordcloud'])
-def send_word_cloud(message):
-    entries = fetch_journal_entries(message.chat.id)
-    complete_text = " ".join([entry.text for entry in entries])
-    word_counts = generate_word_frequencies(complete_text)
-    img = create_word_cloud(word_counts)
-    bot.send_photo(chat_id=message.chat.id, photo=img, caption="Here's your word cloud!")
-    img.close()  # Close the BytesIO object after sending to free memory
-
-
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
     markup = InlineKeyboardMarkup()
@@ -303,11 +295,31 @@ def handle_query(call):
         "Tap an option below or just send a message to begin journaling! 📝"
     )
         markup = InlineKeyboardMarkup()
-        markup.row_width = 1
+        markup.row_width = 2
         journals_markup = "journals_markup"
-        markup.add(InlineKeyboardButton("🗂️ View Journals", callback_data=journals_markup))
+        wordcloud_markup = "generate_wordcloud"
+        markup.add(InlineKeyboardButton("🗂️ View Journals", callback_data=journals_markup),
+                   InlineKeyboardButton("☁️ Generate Word Cloud", callback_data=wordcloud_markup))
         bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                               text=description, reply_markup=markup,parse_mode='HTML')
+
+    elif split[0] == "generate_wordcloud":
+        if is_journal_entry_more_than_10(chat_id):
+            entries = fetch_journal_entries(chat_id)
+            complete_text = " ".join([entry.text for entry in entries])
+            word_counts = generate_word_frequencies(complete_text)
+            img = create_word_cloud(word_counts)
+            bot.send_photo(chat_id=chat_id, photo=img, caption="Here's your word cloud!")
+            img.close()
+        else:
+            markup = InlineKeyboardMarkup()
+            markup.row_width = 1
+            main_menu = "main_menu"
+            response = "It seems you have less than 10 journal posts. A word cloud is more meaningful with more content. 😊 Consider adding more journal posts before generating a word cloud!"
+            markup.add(InlineKeyboardButton("Main Menu", callback_data=main_menu))
+            bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
+                              text=response,
+                              reply_markup=markup)
 
     elif split[0] == "confirm_voice":
         try:
