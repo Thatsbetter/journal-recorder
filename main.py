@@ -12,6 +12,7 @@ import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from transformers import pipeline
 
+from consts import *
 from credential import Credential
 from database_service import save_text_id, save_file_id, save_journal_entry, get_last_entry, get_text_id, get_file_id, \
     get_all_chatids, fetch_journal_entries, is_journal_entry_more_than_10, init_db, get_journals_by_week
@@ -219,8 +220,10 @@ def handle_query(call):
         markup.row_width = 2
         journals_markup = "journals_markup"
         wordcloud_markup = "generate_wordcloud"
+        why_journal = "why_journal"
         markup.add(InlineKeyboardButton("🗂️ View Journals", callback_data=journals_markup),
-                   InlineKeyboardButton("☁️ Generate Word Cloud", callback_data=wordcloud_markup))
+                   InlineKeyboardButton("☁️ Generate Word Cloud", callback_data=wordcloud_markup),
+                   InlineKeyboardButton("🤔 Why Journal?", callback_data=why_journal))
         bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                               text=description, reply_markup=markup, parse_mode='HTML')
 
@@ -241,7 +244,15 @@ def handle_query(call):
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                                   text=response,
                                   reply_markup=markup)
-
+    elif split[0] == "why_journal":
+        markup = InlineKeyboardMarkup()
+        markup.row_width = 1
+        main_menu = "main_menu"
+        response = get_why_journal_text()
+        markup.add(InlineKeyboardButton("Main Menu", callback_data=main_menu))
+        bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
+                              text=response, parse_mode='HTML',
+                              reply_markup=markup)
     elif split[0] == "confirm_voice":
         try:
             file_id = get_file_id(message_id=split[1])
@@ -262,7 +273,7 @@ def handle_query(call):
                        InlineKeyboardButton("Main Menu", callback_data=main_menu))
             # Respond to the user
             bot.send_message(chat_id=chat_id,
-                             text="Thank you for sharing your thoughts! It has been saved.\n \n Feel free to read your past journal using buttons below:)",
+                             text=get_entry_saved_text(),
                              reply_markup=markup)
             bot.set_message_reaction(chat_id=chat_id, message_id=split[1],
                                      reaction=[telebot.types.ReactionTypeEmoji("👍")])
@@ -293,7 +304,7 @@ def handle_query(call):
                        InlineKeyboardButton("Main Menu", callback_data=main_menu))
             # Respond to the user
             bot.send_message(chat_id=chat_id,
-                             text="Thank you for sharing your thoughts! It has been saved.\n \n Feel free to read your past journal using buttons below:)",
+                             text=get_entry_saved_text(),
                              reply_markup=markup)
             bot.set_message_reaction(chat_id=chat_id, message_id=split[1],
                                      reaction=[telebot.types.ReactionTypeEmoji("👍")])
