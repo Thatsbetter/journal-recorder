@@ -270,8 +270,9 @@ def handle_query(call):
                              text="Thank you for sharing your thoughts! It has been saved.\n \n Feel free to read your past journal using buttons below:)",
                              reply_markup=markup)
 
-            similar_entries = find_similar_journal_entries(fetch_journal_entries_by_week(chat_id, 16))
-            if similar_entries:
+            fetched_entries = fetch_journal_entries_by_week(chat_id, 16)
+            if fetched_entries:
+                similar_entries = find_similar_journal_entries(fetched_entries)
                 response = "Just so you know, you had similar Thoughts in past Months :\n"
                 for entry, timestamp, score in similar_entries:
                     date = timestamp.strftime('%Y-%m-%d %H:%M')
@@ -298,8 +299,9 @@ def handle_query(call):
                              text="Thank you for sharing your thoughts! It has been saved.\n \n Feel free to read your past journal using buttons below:)",
                              reply_markup=markup)
 
-            similar_entries = find_similar_journal_entries(fetch_journal_entries_by_week(chat_id, 16))
-            if similar_entries:
+            fetched_entries = fetch_journal_entries_by_week(chat_id, 16)
+            if fetched_entries:
+                similar_entries = find_similar_journal_entries(fetched_entries)
                 response = "Just so you know, you had similar Thoughts in past Months :\n \n"
                 for entry, timestamp in similar_entries:
                     date = timestamp.strftime('%Y-%m-%d %H:%M')
