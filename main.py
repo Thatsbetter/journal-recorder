@@ -293,6 +293,23 @@ def handle_query(call):
                               text="You dont have any journals yet. Feel free to add one by just sending a text or voice message.",
                               reply_markup=markup)
 
+    elif split[0] == "main_menu":
+        description = (
+        "📘 <b>Welcome to Your Digital Journaling Assistant!</b> 📘\n\n"
+        "<i>Start journaling anytime by sending a text or voice message. Here to help you capture your thoughts seamlessly!</i> 🖋️🎙️\n\n"
+        "📝 <b>It helps you with:</b>\n"
+        "- <b>Word Cloud:</b> See a visual of your most used words.\n"
+        "- <b>View Your Journals:</b> Review entries or generate a word cloud.\n"
+        "- <b>Discover Similar Entries:</b> Identify insights into recurring thoughts.\n\n"
+        "Tap an option below or just send a message to begin journaling! 📝"
+    )
+        markup = InlineKeyboardMarkup()
+        markup.row_width = 1
+        journals_markup = "journals_markup"
+        markup.add(InlineKeyboardButton("🗂️ View Journals", callback_data=journals_markup))
+        bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
+                              text=description, reply_markup=markup,parse_mode='HTML')
+
     elif split[0] == "confirm_voice":
         try:
             file_id = get_file_id(message_id=split[1])
