@@ -264,7 +264,8 @@ def handle_query(call):
             bot.send_message(chat_id=chat_id,
                              text="Thank you for sharing your thoughts! It has been saved.\n \n Feel free to read your past journal using buttons below:)",
                              reply_markup=markup)
-
+            bot.set_message_reaction(chat_id=chat_id, message_id=split[1],
+                                     reaction=[telebot.types.ReactionTypeEmoji("👍")])
             fetched_entries = fetch_journal_entries_by_week(chat_id, 16)
             if fetched_entries:
                 similar_entries = find_similar_journal_entries(fetched_entries)
@@ -294,6 +295,8 @@ def handle_query(call):
             bot.send_message(chat_id=chat_id,
                              text="Thank you for sharing your thoughts! It has been saved.\n \n Feel free to read your past journal using buttons below:)",
                              reply_markup=markup)
+            bot.set_message_reaction(chat_id=chat_id, message_id=split[1],
+                                     reaction=[telebot.types.ReactionTypeEmoji("👍")])
 
             fetched_entries = fetch_journal_entries_by_week(chat_id, 16)
             if fetched_entries:
