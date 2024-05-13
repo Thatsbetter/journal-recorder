@@ -268,11 +268,12 @@ def handle_query(call):
             fetched_entries = fetch_journal_entries_by_week(chat_id, 16)
             if fetched_entries:
                 similar_entries = find_similar_journal_entries(fetched_entries)
-                response = "Just so you know, you had similar Thoughts in past Months :\n"
-                for entry, timestamp, score in similar_entries:
-                    date = timestamp.strftime('%Y-%m-%d %H:%M')
-                    response += f"- {date}: {entry} (Score: {score:.2f})\n"
-                send_chunked_message(chat_id, response)
+                if similar_entries:
+                    response = "Just so you know, you had similar Thoughts in past Months :\n"
+                    for entry, timestamp, score in similar_entries:
+                        date = timestamp.strftime('%Y-%m-%d %H:%M')
+                        response += f"- {date}: {entry} (Score: {score:.2f})\n"
+                    send_chunked_message(chat_id, response)
         except Exception as e:
             logging.error(f"Error handling query: {str(e)}")
             bot.answer_callback_query(call.id, "Failed to save you journal.")
@@ -297,11 +298,12 @@ def handle_query(call):
             fetched_entries = fetch_journal_entries_by_week(chat_id, 16)
             if fetched_entries:
                 similar_entries = find_similar_journal_entries(fetched_entries)
-                response = "Just so you know, you had similar Thoughts in past Months :\n \n"
-                for entry, timestamp in similar_entries:
-                    date = timestamp.strftime('%Y-%m-%d %H:%M')
-                    response += f"- {date}: {entry}\n"
-                send_chunked_message(chat_id, response)
+                if similar_entries:
+                    response = "Just so you know, you had similar Thoughts in past Months :\n \n"
+                    for entry, timestamp in similar_entries:
+                        date = timestamp.strftime('%Y-%m-%d %H:%M')
+                        response += f"- {date}: {entry}\n"
+                    send_chunked_message(chat_id, response)
         except Exception as e:
             logging.error(f"Error handling query: {str(e)}")
             bot.answer_callback_query(call.id, "Failed to save you journal.")
