@@ -1,5 +1,5 @@
 # Bot token from BotFather
-from datetime import datetime, timedelta
+from datetime import timedelta
 import logging
 import os
 import shutil
@@ -11,9 +11,8 @@ import requests
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from transformers import pipeline
-from database_service import *
 
-from credential import Credential
+from database_service import *
 from text_processing import generate_word_frequencies, create_word_cloud, find_similar_journal_entries
 
 logging.basicConfig(filename='error.log', level=logging.ERROR,
@@ -23,6 +22,7 @@ TOKEN = Credential().get_telegram_token()
 
 bot = telebot.TeleBot(TOKEN)
 init_db()
+
 
 def remind_users_to_journal():
     try:
@@ -129,6 +129,7 @@ def handle_voice(message):
         reply_to_message_id=message.message_id
     )
 
+
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
     markup = InlineKeyboardMarkup()
@@ -186,8 +187,8 @@ def handle_query(call):
             main_menu = "main_menu"
             markup.add(InlineKeyboardButton("Main Menu", callback_data=main_menu))
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
-                              text="You dont have any journals yet. Feel free to add one by just sending a text or voice message.",
-                              reply_markup=markup)
+                                  text="You dont have any journals yet. Feel free to add one by just sending a text or voice message.",
+                                  reply_markup=markup)
     elif split[0] == "show_journal_4":
         response = get_weekly_entries(chat_id, 4)
         if response:
@@ -206,19 +207,19 @@ def handle_query(call):
             main_menu = "main_menu"
             markup.add(InlineKeyboardButton("Main Menu", callback_data=main_menu))
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
-                              text="You dont have any journals yet. Feel free to add one by just sending a text or voice message.",
-                              reply_markup=markup)
+                                  text="You dont have any journals yet. Feel free to add one by just sending a text or voice message.",
+                                  reply_markup=markup)
 
     elif split[0] == "main_menu":
         description = (
-        "📘 <b>Welcome to Your Digital Journaling Assistant!</b> 📘\n\n"
-        "<i>Start journaling anytime by sending a text or voice message. Here to help you capture your thoughts seamlessly!</i> 🖋️🎙️\n\n"
-        "📝 <b>It helps you with:</b>\n"
-        "- <b>Word Cloud:</b> See a visual of your most used words.\n"
-        "- <b>View Your Journals:</b> Review entries or generate a word cloud.\n"
-        "- <b>Discover Similar Entries:</b> Identify insights into recurring thoughts.\n\n"
-        "Tap an option below or just send a message to begin journaling! 📝"
-    )
+            "📘 <b>Welcome to Your Digital Journaling Assistant!</b> 📘\n\n"
+            "<i>Start journaling anytime by sending a text or voice message. Here to help you capture your thoughts seamlessly!</i> 🖋️🎙️\n\n"
+            "📝 <b>It helps you with:</b>\n"
+            "- <b>Word Cloud:</b> See a visual of your most used words.\n"
+            "- <b>View Your Journals:</b> Review entries or generate a word cloud.\n"
+            "- <b>Discover Similar Entries:</b> Identify insights into recurring thoughts.\n\n"
+            "Tap an option below or just send a message to begin journaling! 📝"
+        )
         markup = InlineKeyboardMarkup()
         markup.row_width = 2
         journals_markup = "journals_markup"
@@ -226,7 +227,7 @@ def handle_query(call):
         markup.add(InlineKeyboardButton("🗂️ View Journals", callback_data=journals_markup),
                    InlineKeyboardButton("☁️ Generate Word Cloud", callback_data=wordcloud_markup))
         bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
-                              text=description, reply_markup=markup,parse_mode='HTML')
+                              text=description, reply_markup=markup, parse_mode='HTML')
 
     elif split[0] == "generate_wordcloud":
         if is_journal_entry_more_than_10(chat_id):
@@ -243,8 +244,8 @@ def handle_query(call):
             response = "It seems you have less than 10 journal posts. A word cloud is more meaningful with more content. 😊 Consider adding more journal posts before generating a word cloud!"
             markup.add(InlineKeyboardButton("Main Menu", callback_data=main_menu))
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
-                              text=response,
-                              reply_markup=markup)
+                                  text=response,
+                                  reply_markup=markup)
 
     elif split[0] == "confirm_voice":
         try:
