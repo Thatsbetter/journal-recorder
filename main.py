@@ -56,7 +56,6 @@ class TextId(Base):
 Base.metadata.create_all(engine)
 
 
-# Initialize the Whisper pipeline
 def save_journal_entry(chat_id, text):
     with Session() as session:
         new_entry = JournalEntry(chat_id=chat_id, text=text)
