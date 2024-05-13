@@ -61,5 +61,14 @@ def get_last_entry(chat_id):
     with Session() as session:
         return session.query(JournalEntry).filter_by(chat_id=chat_id).order_by(
             JournalEntry.timestamp.desc()).first()
+
+
+def get_journals_by_week(chat_id, weeks=1):
+    with Session() as session:
+        entries = session.query(JournalEntry).filter(
+            JournalEntry.chat_id == chat_id,
+            JournalEntry.timestamp >= weeks
+        ).all()
+        return entries
 def init_db():
     init_models()

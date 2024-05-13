@@ -1,5 +1,5 @@
 # Bot token from BotFather
-from datetime import timedelta
+from datetime import timedelta, datetime
 import logging
 import os
 import shutil
@@ -12,7 +12,9 @@ import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from transformers import pipeline
 
-from database_service import *
+from credential import Credential
+from database_service import save_text_id, save_file_id, save_journal_entry, get_last_entry, get_text_id, get_file_id, \
+    get_all_chatids, fetch_journal_entries, is_journal_entry_more_than_10, init_db, get_journals_by_week
 from text_processing import generate_word_frequencies, create_word_cloud, find_similar_journal_entries
 
 logging.basicConfig(filename='error.log', level=logging.ERROR,
@@ -92,12 +94,8 @@ def transcribe_audio(path_to_audio):
 
 
 def fetch_journal_entries_by_week(chat_id, weeks=1):
-    one_week_ago = datetime.utcnow() - timedelta(weeks=weeks)
-    with Session() as session:
-        entries = session.query(JournalEntry).filter(
-            JournalEntry.chat_id == chat_id,
-            JournalEntry.timestamp >= one_week_ago
-        ).all()
+    weeks_ago = datetime.utcnow() - timedelta(weeks=weeks)
+    entries = get_journals_by_week(chat_id, weeks_ago)
     return [(entry.text, entry.timestamp) for entry in entries]
 
 
