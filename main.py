@@ -8,96 +8,21 @@ from tempfile import NamedTemporaryFile
 from apscheduler.schedulers.background import BackgroundScheduler
 import ffmpeg
 import requests
-from sqlalchemy import create_engine, Column, Integer, Text, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, scoped_session
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from transformers import pipeline
+from database_service import *
 
 from credential import Credential
 from text_processing import generate_word_frequencies, create_word_cloud, find_similar_journal_entries
 
 logging.basicConfig(filename='error.log', level=logging.ERROR,
                     format='%(asctime)s:%(levelname)s:%(message)s')
-Base = declarative_base()
 transcriber = pipeline(model="openai/whisper-small")
 TOKEN = Credential().get_telegram_token()
 
 bot = telebot.TeleBot(TOKEN)
-
-engine = create_engine(Credential().get_conn_uri())
-session_factory = sessionmaker(bind=engine)
-Session = scoped_session(session_factory)
-
-
-class JournalEntry(Base):
-    __tablename__ = 'journal_entries'
-    id = Column(Integer, primary_key=True)
-    chat_id = Column(Integer, nullable=False)
-    text = Column(Text, nullable=False)
-    timestamp = Column(DateTime, default=datetime.utcnow)
-
-
-class FileId(Base):
-    __tablename__ = 'file_id'
-    id = Column(Integer, primary_key=True)
-    message_id = Column(Integer, nullable=False)
-    file_id = Column(Text, nullable=False)
-
-
-class TextId(Base):
-    __tablename__ = 'text_id'
-    id = Column(Integer, primary_key=True)
-    message_id = Column(Integer, nullable=False)
-    text = Column(Text, nullable=False)
-
-
-Base.metadata.create_all(engine)
-
-
-def save_journal_entry(chat_id, text):
-    with Session() as session:
-        new_entry = JournalEntry(chat_id=chat_id, text=text)
-        session.add(new_entry)
-        session.commit()
-
-
-def save_file_id(message_id, file_id):
-    with Session() as session:
-        new_file_id = FileId(message_id=message_id, file_id=file_id)
-        session.add(new_file_id)
-        session.commit()
-
-
-def fetch_journal_entries(chat_id):
-    with Session() as session:
-        return session.query(JournalEntry.text).filter_by(chat_id=chat_id).all()
-
-def is_journal_entry_more_than_10(chat_id):
-    with Session() as session:
-        return len(session.query(JournalEntry.text).filter_by(chat_id=chat_id).all()) > 10
-
-def get_file_id(message_id):
-    # get file_id with this message_id
-    with Session() as session:
-        file_association = session.query(FileId).filter_by(message_id=message_id).first()
-        return file_association.file_id if file_association else None
-
-
-def save_text_id(message_id, text):
-    with Session() as session:
-        new_text_id = TextId(message_id=message_id, text=text)
-        session.add(new_text_id)
-        session.commit()
-
-
-def get_text_id(message_id):
-    # get text with this message_id
-    with Session() as session:
-        found_text = session.query(TextId).filter_by(message_id=message_id).first()
-        return found_text.text if found_text else None
-
+init_db()
 
 def remind_users_to_journal():
     try:
