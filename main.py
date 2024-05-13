@@ -26,15 +26,12 @@ init_db()
 
 def remind_users_to_journal():
     try:
-        with Session() as session:
-            chat_ids = session.query(JournalEntry.chat_id).distinct().all()
-
-            for chat_id, in chat_ids:
-                last_entry = session.query(JournalEntry).filter_by(chat_id=chat_id).order_by(
-                    JournalEntry.timestamp.desc()).first()
-                if last_entry is None or (datetime.utcnow() - last_entry.timestamp) > timedelta(days=2):
-                    bot.send_message(chat_id,
-                                     "Hey! You haven't journaled in the last two days. Why not make a new entry today?")
+        chat_ids = get_all_chatids()
+        for chat_id, in chat_ids:
+            last_entry = get_last_entry(chat_id)
+            if last_entry is None or (datetime.utcnow() - last_entry.timestamp) > timedelta(days=2):
+                bot.send_message(chat_id,
+                                 "Hey! You haven't journaled in the last two days. Why not make a new entry today?")
     except Exception as e:
         logging.error(f"Failed to send reminder: {e}")
 

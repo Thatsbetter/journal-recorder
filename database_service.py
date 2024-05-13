@@ -1,4 +1,5 @@
 from sqlalchemy.orm import sessionmaker, scoped_session
+
 from models import *
 
 engine = get_engine()
@@ -50,5 +51,15 @@ def get_text_id(message_id):
         found_text = session.query(TextId).filter_by(message_id=message_id).first()
         return found_text.text if found_text else None
 
+
+def get_all_chatids():
+    with Session() as session:
+        return session.query(JournalEntry.chat_id).distinct().all()
+
+
+def get_last_entry(chat_id):
+    with Session() as session:
+        return session.query(JournalEntry).filter_by(chat_id=chat_id).order_by(
+            JournalEntry.timestamp.desc()).first()
 def init_db():
     init_models()
