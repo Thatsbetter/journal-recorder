@@ -177,37 +177,13 @@ def fetch_journal_entries_by_week(chat_id, weeks=1):
     return [(entry.text, entry.timestamp) for entry in entries]
 
 
-@bot.message_handler(commands=['weekly_entries'])
-def show_weekly_entries(message):
-    chat_id = message.chat.id
+def get_weekly_entries(chat_id, week=1):
     entries = fetch_journal_entries_by_week(chat_id)
     if entries:
         response = "\n\n".join([f"{entry[1].strftime('%Y-%m-%d %H:%M:%S')}: {entry[0]}" for entry in entries])
-        send_chunked_message(chat_id, f"Here are your journal entries from the past week:\n{response}")
+        return response
     else:
-        bot.send_message(chat_id, "You have no journal entries from the past week.")
-
-
-@bot.message_handler(commands=['monthly_entries'])
-def show_monthly_entries(message):
-    chat_id = message.chat.id
-    entries = fetch_journal_entries_by_week(chat_id, weeks=4)
-    if entries:
-        response = "\n\n".join([f"{entry[1].strftime('%Y-%m-%d %H:%M:%S')}: {entry[0]}" for entry in entries])
-        send_chunked_message(chat_id, f"Here are your journal entries from the past month:\n{response}")
-    else:
-        bot.send_message(chat_id, "You have no journal entries from the past month.")
-
-
-@bot.message_handler(commands=['two_month_entries'])
-def show_two_month_entries(message):
-    chat_id = message.chat.id
-    entries = fetch_journal_entries_by_month(chat_id, weeks=8)
-    if entries:
-        response = "\n\n".join([f"{entry[1].strftime('%Y-%m-%d %H:%M:%S')}: {entry[0]}" for entry in entries])
-        send_chunked_message(chat_id, f"Here are your journal entries from the past two months:\n{response}")
-    else:
-        bot.send_message(chat_id, "You have no journal entries from the past two months.")
+        return None
 
 
 @bot.message_handler(content_types=['voice'])
@@ -262,6 +238,61 @@ def handle_query(call):
         # Notify user of cancellation
         bot.send_message(chat_id=chat_id,
                          text="Got it! It won´t be saved. \n You can try again.")
+    elif split[0] == "journals_markup":
+        markup = InlineKeyboardMarkup()
+        markup.row_width = 2
+        weekly_journals = f"show_journal_1"
+        last_month_journals = f"show_journal_4"
+        main_menu = "main_menu"
+        markup.add(InlineKeyboardButton("Last week", callback_data=weekly_journals),
+                   InlineKeyboardButton("Last month", callback_data=last_month_journals),
+                   InlineKeyboardButton("Main Menu", callback_data=main_menu))
+        # Respond to the user
+        bot.send_message(chat_id=chat_id,
+                         text="Select time frame that you want to see",
+                         reply_markup=markup)
+
+    elif split[0] == "show_journal_1":
+        response = get_weekly_entries(chat_id)
+        if response is not None:
+            markup = InlineKeyboardMarkup()
+            markup.row_width = 2
+            last_month_journals = f"show_journal_4"
+            main_menu = "main_menu"
+            markup.add(InlineKeyboardButton("Last month", callback_data=last_month_journals),
+                       InlineKeyboardButton("Main Menu", callback_data=main_menu))
+            bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
+                                  text=response,
+                                  reply_markup=markup)
+        else:
+            markup = InlineKeyboardMarkup()
+            markup.row_width = 1
+            main_menu = "main_menu"
+            markup.add(InlineKeyboardButton("Main Menu", callback_data=main_menu))
+            bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
+                              text="You dont have any journals yet. Feel free to add one by just sending a text or voice message.",
+                              reply_markup=markup)
+    elif split[0] == "show_journal_4":
+        response = get_weekly_entries(chat_id, 4)
+        if response:
+            markup = InlineKeyboardMarkup()
+            markup.row_width = 2
+            last_week_journals = f"show_journal_1"
+            main_menu = "main_menu"
+            markup.add(InlineKeyboardButton("Last week", callback_data=last_week_journals),
+                       InlineKeyboardButton("Main Menu", callback_data=main_menu))
+            bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
+                                  text=response,
+                                  reply_markup=markup)
+        else:
+            markup = InlineKeyboardMarkup()
+            markup.row_width = 1
+            main_menu = "main_menu"
+            markup.add(InlineKeyboardButton("Main Menu", callback_data=main_menu))
+            bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
+                              text="You dont have any journals yet. Feel free to add one by just sending a text or voice message.",
+                              reply_markup=markup)
+
     elif split[0] == "confirm_voice":
         try:
             file_id = get_file_id(message_id=split[1])
@@ -274,13 +305,20 @@ def handle_query(call):
             # Save the journal entry
             save_journal_entry(chat_id, transcription)
 
+            markup = InlineKeyboardMarkup()
+            markup.row_width = 2
+            journals_markup = "journals_markup"
+            main_menu = "main_menu"
+            markup.add(InlineKeyboardButton("See your Journals", callback_data=journals_markup),
+                       InlineKeyboardButton("Main Menu", callback_data=main_menu))
             # Respond to the user
             bot.send_message(chat_id=chat_id,
-                             text="Thank you for sharing your thoughts! It has been saved.")
+                             text="Thank you for sharing your thoughts! It has been saved.\n \n Feel free to read your past journal using buttons below:)",
+                             reply_markup=markup)
 
             similar_entries = find_similar_journal_entries(fetch_journal_entries_by_week(chat_id, 16))
             if similar_entries:
-                response = "Just so you know, you had similar Thoughts in past 4 Months :\n"
+                response = "Just so you know, you had similar Thoughts in past Months :\n"
                 for entry, timestamp, score in similar_entries:
                     date = timestamp.strftime('%Y-%m-%d %H:%M')
                     response += f"- {date}: {entry} (Score: {score:.2f})\n"
@@ -295,12 +333,20 @@ def handle_query(call):
             # Save the journal entry
             save_journal_entry(chat_id, text)
 
+            markup = InlineKeyboardMarkup()
+            markup.row_width = 2
+            journals_markup = f"journals_markup"
+            main_menu = "main_menu"
+            markup.add(InlineKeyboardButton("See your Journals", callback_data=journals_markup),
+                       InlineKeyboardButton("Main Menu", callback_data=main_menu))
             # Respond to the user
             bot.send_message(chat_id=chat_id,
-                             text="Thank you for sharing your thoughts! It has been saved.")
+                             text="Thank you for sharing your thoughts! It has been saved.\n \n Feel free to read your past journal using buttons below:)",
+                             reply_markup=markup)
+
             similar_entries = find_similar_journal_entries(fetch_journal_entries_by_week(chat_id, 16))
             if similar_entries:
-                response = "Just so you know, you had similar Thoughts in past 4 Months :\n \n"
+                response = "Just so you know, you had similar Thoughts in past Months :\n \n"
                 for entry, timestamp in similar_entries:
                     date = timestamp.strftime('%Y-%m-%d %H:%M')
                     response += f"- {date}: {entry}\n"
