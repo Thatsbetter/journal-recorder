@@ -3,27 +3,27 @@ class WhyJournal:
     @staticmethod
     def description():
         return """
-    <b>Why Journal?</b>
-    Journaling is a powerful tool for self-reflection and stress relief. 
-    It helps you organize your thoughts, monitor your personal growth, and gain insight into your emotional well-being. 
-    For instance, according to a study published in the Journal of Psychiatric and Mental Health Nursing, participants who engaged in expressive writing reported a 28% reduction in stress levels.
-    By regularly recording your experiences and feelings, you can uncover patterns in your thoughts and behaviors, leading to better mental clarity and problem-solving skills.
-    
-    <b>Getting started is easy:</b>
-    
-    1. <b>Choose Your Moments </b>: 
-    Anytime you have a thought, a memory, or a detail from your day you wish to preserve, just send a text or a voice message to this bot.
-    2. <b>Write Regularly </b> : 
-    Make it a habit—try to journal daily. Even a few lines each day are enough to start reaping the benefits. Consistency is key!
-    3. <b>Express Freely </b>: 
-    There’s no judgment here. This bot is your private space to express yourself openly and honestly. The more truthful you are with your entries, the more meaningful your journaling experience will be.
-    4. <b>Reflect on Your Journey </b>: 
-    Use the bot's features to review past entries, see word clouds highlighting your common themes, or find similar past thoughts. This can be incredibly rewarding and insightful.
-    
-    Don’t worry about structure or rules. Your journal is uniquely yours, and this bot is here to accommodate all forms of entries—whether you prefer to type them out or say them aloud.
-    
-    Start journaling today! Tap a button to continue or simply send a message or voice note to add your first journal entry. 📘 🎙️
-    """
+<b>Why Journal?</b>
+Journaling is a powerful tool for self-reflection and stress relief. 
+It helps you organize your thoughts, monitor your personal growth, and gain insight into your emotional well-being. 
+For instance, according to a study published in the Journal of Psychiatric and Mental Health Nursing, participants who engaged in expressive writing reported a 28% reduction in stress levels.
+By regularly recording your experiences and feelings, you can uncover patterns in your thoughts and behaviors, leading to better mental clarity and problem-solving skills.
+
+<b>Getting started is easy:</b>
+
+1. <b>Choose Your Moments </b>: 
+Anytime you have a thought, a memory, or a detail from your day you wish to preserve, just send a text or a voice message to this bot.
+2. <b>Write Regularly </b> : 
+Make it a habit—try to journal daily. Even a few lines each day are enough to start reaping the benefits. Consistency is key!
+3. <b>Express Freely </b>: 
+There’s no judgment here. This bot is your private space to express yourself openly and honestly. The more truthful you are with your entries, the more meaningful your journaling experience will be.
+4. <b>Reflect on Your Journey </b>: 
+Use the bot's features to review past entries, see word clouds highlighting your common themes, or find similar past thoughts. This can be incredibly rewarding and insightful.
+
+Don’t worry about structure or rules. Your journal is uniquely yours, and this bot is here to accommodate all forms of entries—whether you prefer to type them out or say them aloud.
+
+Start journaling today! Tap a button to continue or simply send a message or voice note to add your first journal entry. 📘 🎙️
+"""
 
     @staticmethod
     def button():
