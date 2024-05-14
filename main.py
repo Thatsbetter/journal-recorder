@@ -23,6 +23,9 @@ logging.basicConfig(filename='error.log', level=logging.ERROR,
 transcriber = pipeline(model="openai/whisper-small")
 TOKEN = Credential().get_telegram_token()
 
+WEBHOOK_SSL_CERT = 'webhook_cert.pem'  # Path to the ssl certificate
+WEBHOOK_SSL_PRIV = 'webhook_pkey.pem'  # Path to the ssl private key
+DOMAIN = '134.122.70.253'  # either domain, or ip address of vps
 bot = telebot.TeleBot(TOKEN)
 init_db()
 
@@ -310,9 +313,13 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(remind_users_to_journal, 'cron', day_of_week='*', hour=19, minute=0)  # Run daily at 7:00 PM
 scheduler.start()
 
-# Setup polling
+# Setup webhook
 try:
-    bot.infinity_polling(interval=0)
+    bot.run_webhooks(
+        listen=DOMAIN,
+        certificate=WEBHOOK_SSL_CERT,
+        certificate_key=WEBHOOK_SSL_PRIV
+    )
 except Exception as e:
     logging.error(f"Bot polling failed: {e}")
 finally:
