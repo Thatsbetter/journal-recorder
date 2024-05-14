@@ -282,7 +282,7 @@ def handle_query(call):
                 similar_entries = find_similar_journal_entries(fetched_entries)
                 if similar_entries:
                     response = "Just so you know, you had similar Thoughts in past Months :\n"
-                    for entry, timestamp, score in similar_entries:
+                    for entry, timestamp in similar_entries:
                         date = timestamp.strftime('%Y-%m-%d %H:%M')
                         response += f"- {date}: {entry} (Score: {score:.2f})\n"
                     send_chunked_message(chat_id, response)
