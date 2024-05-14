@@ -53,6 +53,10 @@ def get_cancel_callback():
     return "cancel"
 
 
+def get_cancel_text():
+    return "No worries, your entry has not been saved. \nWhenever you're ready, feel free to share your thoughts again. 😊"
+
+
 def get_confirm_text_save_text():
     return "Would you like to add this text as a journal entry? \n \nFeel free to rewrite if you’d like to adjust your thoughts."
 

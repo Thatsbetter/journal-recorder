@@ -148,9 +148,13 @@ def handle_query(call):
     split = call.data.split(":")
     chat_id = call.message.chat.id
     if split[0] == get_cancel_callback():
+        markup = InlineKeyboardMarkup()
+        markup.row_width = 2
+        markup.add(InlineKeyboardButton(get_show_journal_button(), callback_data=get_show_journal_callback()),
+                   InlineKeyboardButton(get_main_menu_button(), callback_data=get_main_menu_callback()))
         # Notify user of cancellation
-        bot.send_message(chat_id=chat_id,
-                         text="Got it! It won´t be saved. \n You can try again.")
+        bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
+                              text=get_cancel_text(), reply_markup=markup)
     elif split[0] == get_show_journal_callback():
         markup = InlineKeyboardMarkup()
         markup.row_width = 2
