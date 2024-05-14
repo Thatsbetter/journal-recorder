@@ -204,10 +204,9 @@ def handle_query(call):
     elif split[0] == get_main_menu_callback():
         markup = InlineKeyboardMarkup()
         markup.row_width = 2
-        why_journal = "why_journal"
         markup.add(InlineKeyboardButton(get_show_journal_button(), callback_data=get_show_journal_callback()),
                    InlineKeyboardButton(get_wordcloud_button(), callback_data=get_wordcloud_callback()),
-                   InlineKeyboardButton("🤔 Why Journal?", callback_data=why_journal))
+                   InlineKeyboardButton(get_why_journal_button(), callback_data=get_why_journal_callback()))
         bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                               text=description, reply_markup=markup, parse_mode='HTML')
 
@@ -226,7 +225,7 @@ def handle_query(call):
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                                   text=response,
                                   reply_markup=markup)
-    elif split[0] == "why_journal":
+    elif split[0] == get_why_journal_callback():
         markup = InlineKeyboardMarkup()
         markup.row_width = 1
         response = get_why_journal_text()

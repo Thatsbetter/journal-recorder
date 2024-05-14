@@ -23,6 +23,13 @@ Start journaling today! Tap a button to continue or simply send a message or voi
 """
 
 
+def get_why_journal_button():
+    return "🤔 Why Journal?"
+
+
+def get_why_journal_callback():
+    return "why_journal"
+
 def get_entry_saved_text():
     return """Your thoughts have been saved! 🌟
 
