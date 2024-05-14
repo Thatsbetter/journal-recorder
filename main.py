@@ -272,7 +272,7 @@ def handle_query(call):
             markup.add(InlineKeyboardButton("See your Journals", callback_data=journals_markup),
                        InlineKeyboardButton("Main Menu", callback_data=main_menu))
             # Respond to the user
-            bot.send_message(chat_id=chat_id,
+            bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                              text=get_entry_saved_text(),
                              reply_markup=markup)
             bot.set_message_reaction(chat_id=chat_id, message_id=split[1],
@@ -303,7 +303,7 @@ def handle_query(call):
             markup.add(InlineKeyboardButton("See your Journals", callback_data=journals_markup),
                        InlineKeyboardButton("Main Menu", callback_data=main_menu))
             # Respond to the user
-            bot.send_message(chat_id=chat_id,
+            bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                              text=get_entry_saved_text(),
                              reply_markup=markup)
             bot.set_message_reaction(chat_id=chat_id, message_id=split[1],
