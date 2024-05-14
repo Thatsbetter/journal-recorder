@@ -24,3 +24,5 @@ class Credential():
     def get_conn_uri(self):
         return "postgresql://%s:%s@127.0.0.1:5432/%s" %(self.get_username(), self.get_password(), self.get_database_name())
 
+    def get_ip_address(self):
+        return self.obj["ip_address"]

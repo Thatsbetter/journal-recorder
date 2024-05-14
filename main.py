@@ -25,7 +25,7 @@ TOKEN = Credential().get_telegram_token()
 
 WEBHOOK_SSL_CERT = 'webhook_cert.pem'  # Path to the ssl certificate
 WEBHOOK_SSL_PRIV = 'webhook_pkey.pem'  # Path to the ssl private key
-DOMAIN = '134.122.70.253'  # either domain, or ip address of vps
+DOMAIN = Credential().get_ip_address()  # either domain, or ip address of vps
 bot = telebot.TeleBot(TOKEN)
 init_db()
 
