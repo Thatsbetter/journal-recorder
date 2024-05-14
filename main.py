@@ -34,7 +34,7 @@ def remind_users_to_journal():
             last_entry = get_last_entry(chat_id)
             if last_entry is None or (datetime.utcnow() - last_entry.timestamp) > timedelta(days=2):
                 bot.send_message(chat_id,
-                                 "Hey! You haven't journaled in the last two days. Why not make a new entry today?")
+                                 get_remind_journal_text())
     except Exception as e:
         logging.error(f"Failed to send reminder: {e}")
 

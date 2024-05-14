@@ -3,6 +3,7 @@ def get_why_journal_text():
 <b>Why Journal?</b>
 Journaling is a powerful tool for self-reflection and stress relief. 
 It helps you organize your thoughts, monitor your personal growth, and gain insight into your emotional well-being. 
+For instance, according to a study published in the Journal of Psychiatric and Mental Health Nursing, participants who engaged in expressive writing reported a 28% reduction in stress levels.
 By regularly recording your experiences and feelings, you can uncover patterns in your thoughts and behaviors, leading to better mental clarity and problem-solving skills.
 
 <b>Getting started is easy:</b>
@@ -26,3 +27,7 @@ def get_entry_saved_text():
     return """Your thoughts have been saved! 🌟
 
 Ready to revisit some memories? Just tap the buttons below to explore your previous entries. Enjoy the journey back! ✨"""
+
+
+def get_remind_journal_text():
+    return """"Hello! 🌟 It's been a couple of days since your last journal entry 📖✍️ \nWhy not take a moment now to share your thoughts or a special moment from your day?"""
