@@ -87,3 +87,24 @@ def get_last_month_callback():
 
 def get_no_entry_text():
     return "No entries found for this time frame. Why not add one now? 📖✨"
+
+
+def get_main_menu_text():
+    description = (
+        "📘 <b>Welcome to Your Digital Journaling Assistant!</b> 📘\n\n"
+        "<i>Start journaling anytime by sending a text or voice message. Here to help you capture your thoughts seamlessly!</i> 🖋️🎙️\n\n"
+        "📝 <b>It helps you with:</b>\n"
+        "- <b>Word Cloud:</b> See a visual of your most used words.\n"
+        "- <b>View Your Journals:</b> Review entries or generate a word cloud.\n"
+        "- <b>Discover Similar Entries:</b> Identify insights into recurring thoughts.\n\n"
+        "Tap an option below or just send a message to begin journaling! 📝"
+    )
+    return description
+
+
+def get_main_menu_button():
+    return "🏠 Main Menu"
+
+
+def get_main_menu_callback():
+    return "main_menu"
