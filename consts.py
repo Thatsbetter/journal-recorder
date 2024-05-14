@@ -136,3 +136,7 @@ def get_wordcloud_description():
 
 def get_not_enough_entries_text():
     return "It seems you have less than 10 journal posts. A word cloud is more meaningful with more content.\nWhy not add some more thoughts? Every little bit adds up! 😊"
+
+
+def get_similar_thoughts_text():
+    return "🌟 While looking through your journal, I've discovered that you had similar Thoughts in the past. \nHere's a reflection of your thoughts over time:\n\n"

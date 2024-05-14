@@ -260,10 +260,10 @@ def handle_query(call):
             if fetched_entries:
                 similar_entries = find_similar_journal_entries(fetched_entries)
                 if similar_entries:
-                    response = "Just so you know, you had similar Thoughts in past Months :\n"
+                    response = get_similar_thoughts_text()
                     for entry, timestamp in similar_entries:
                         date = timestamp.strftime('%Y-%m-%d %H:%M')
-                        response += f"- {date}: {entry} (Score: {score:.2f})\n"
+                        response += f"▪️- {date}: {entry} \n"
                     send_chunked_message(chat_id, response)
         except Exception as e:
             logging.error(f"Error handling query: {str(e)}")
@@ -290,10 +290,10 @@ def handle_query(call):
             if fetched_entries:
                 similar_entries = find_similar_journal_entries(fetched_entries)
                 if similar_entries:
-                    response = "Just so you know, you had similar Thoughts in past Months :\n \n"
+                    response = get_similar_thoughts_text()
                     for entry, timestamp in similar_entries:
                         date = timestamp.strftime('%Y-%m-%d %H:%M')
-                        response += f"- {date}: {entry}\n"
+                        response += f"▪️- {date}: {entry}\n"
                     send_chunked_message(chat_id, response)
         except Exception as e:
             logging.error(f"Error handling query: {str(e)}")
