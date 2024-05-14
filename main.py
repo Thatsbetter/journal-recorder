@@ -204,26 +204,24 @@ def handle_query(call):
     elif split[0] == get_main_menu_callback():
         markup = InlineKeyboardMarkup()
         markup.row_width = 2
-        wordcloud_markup = "generate_wordcloud"
         why_journal = "why_journal"
         markup.add(InlineKeyboardButton(get_show_journal_button(), callback_data=get_show_journal_callback()),
-                   InlineKeyboardButton("☁️ Generate Word Cloud", callback_data=wordcloud_markup),
+                   InlineKeyboardButton(get_wordcloud_button(), callback_data=get_wordcloud_callback()),
                    InlineKeyboardButton("🤔 Why Journal?", callback_data=why_journal))
         bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                               text=description, reply_markup=markup, parse_mode='HTML')
 
-    elif split[0] == "generate_wordcloud":
+    elif split[0] == get_wordcloud_callback():
         if is_journal_entry_more_than_10(chat_id):
             entries = fetch_journal_entries(chat_id)
             complete_text = " ".join([entry.text for entry in entries])
             word_counts = generate_word_frequencies(complete_text)
             img = create_word_cloud(word_counts)
-            bot.send_photo(chat_id=chat_id, photo=img, caption="Here's your word cloud!")
+            bot.send_photo(chat_id=chat_id, photo=img, caption=get_wordcloud_description())
             img.close()
         else:
             markup = InlineKeyboardMarkup()
             markup.row_width = 1
-            response = "It seems you have less than 10 journal posts. A word cloud is more meaningful with more content. 😊 Consider adding more journal posts before generating a word cloud!"
             markup.add(InlineKeyboardButton(get_main_menu_button(), callback_data=get_main_menu_callback()))
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                                   text=response,

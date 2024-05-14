@@ -120,3 +120,19 @@ def get_show_journal_button():
 
 def get_show_journal_callback():
     return "journals_markup"
+
+
+def get_wordcloud_callback():
+    return "generate_wordcloud"
+
+
+def get_wordcloud_button():
+    return "☁️ Generate Word Cloud"
+
+
+def get_wordcloud_description():
+    return "Here's your word cloud, visualizing the themes and words you've expressed the most in your journal!"
+
+
+def get_not_enough_entries_text():
+    return "It seems you have less than 10 journal posts. A word cloud is more meaningful with more content.\nWhy not add some more thoughts? Every little bit adds up! 😊"
