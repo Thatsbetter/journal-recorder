@@ -31,3 +31,23 @@ Ready to revisit some memories? Just tap the buttons below to explore your previ
 
 def get_remind_journal_text():
     return """"Hello! 🌟 It's been a couple of days since your last journal entry 📖✍️ \nWhy not take a moment now to share your thoughts or a special moment from your day?"""
+
+
+def get_confirm_voice_save_text():
+    return " \nWould you like to save this voice message as a journal entry? \n \nFeel free to re-record if you’d like to adjust anything."
+
+
+def get_confirm_voice_save_button():
+    return "Yes, save it 📖"
+
+
+def get_cancel_voice_save_button():
+    return "No, record again 🔄"
+
+
+def get_confirm_voice_save_callback():
+    return "confirm_voice"
+
+
+def get_cancel_callback():
+    return "cancel"

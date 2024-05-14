@@ -113,14 +113,14 @@ def get_weekly_entries(chat_id, week=1):
 def handle_voice(message):
     markup = InlineKeyboardMarkup()
     markup.row_width = 2
-    confirm_save = f"confirm_voice:{message.message_id}"
-    cancel_save = "cancel: "
+    confirm_save = f"{get_confirm_voice_save_callback()}:{message.message_id}"
+    cancel_save = get_cancel_callback()
     save_file_id(message_id=message.message_id, file_id=message.voice.file_id)
-    markup.add(InlineKeyboardButton("Yes", callback_data=confirm_save),
-               InlineKeyboardButton("No, I wanna try again", callback_data=cancel_save))
+    markup.add(InlineKeyboardButton(get_confirm_voice_save_button(), callback_data=confirm_save),
+               InlineKeyboardButton(get_cancel_voice_save_button(), callback_data=cancel_save))
     bot.send_message(
         chat_id=message.chat.id,
-        text="Do you want to add this voice message to your journal?",
+        text=get_confirm_voice_save_text(),
         reply_markup=markup,
         reply_to_message_id=message.message_id
     )
@@ -147,7 +147,7 @@ def handle_text(message):
 def handle_query(call):
     split = call.data.split(":")
     chat_id = call.message.chat.id
-    if split[0] == "cancel":
+    if split[0] == get_cancel_callback():
         # Notify user of cancellation
         bot.send_message(chat_id=chat_id,
                          text="Got it! It won´t be saved. \n You can try again.")
@@ -253,7 +253,7 @@ def handle_query(call):
         bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                               text=response, parse_mode='HTML',
                               reply_markup=markup)
-    elif split[0] == "confirm_voice":
+    elif split[0] == get_confirm_voice_save_callback():
         try:
             file_id = get_file_id(message_id=split[1])
             # Process the audio after confirmation
