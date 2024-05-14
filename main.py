@@ -154,25 +154,22 @@ def handle_query(call):
     elif split[0] == "journals_markup":
         markup = InlineKeyboardMarkup()
         markup.row_width = 2
-        weekly_journals = f"show_journal_1"
-        last_month_journals = f"show_journal_4"
         main_menu = "main_menu"
-        markup.add(InlineKeyboardButton("Last week", callback_data=weekly_journals),
-                   InlineKeyboardButton("Last month", callback_data=last_month_journals),
+        markup.add(InlineKeyboardButton(get_last_week_button(), callback_data=get_last_week_callback()),
+                   InlineKeyboardButton(get_last_month_button(), callback_data=get_last_month_callback()),
                    InlineKeyboardButton("Main Menu", callback_data=main_menu))
         # Respond to the user
         bot.send_message(chat_id=chat_id,
-                         text="Select time frame that you want to see",
+                         text=get_select_time_frame_text(),
                          reply_markup=markup)
 
-    elif split[0] == "show_journal_1":
+    elif split[0] == get_last_week_callback():
         response = get_weekly_entries(chat_id)
         if response is not None:
             markup = InlineKeyboardMarkup()
             markup.row_width = 2
-            last_month_journals = f"show_journal_4"
             main_menu = "main_menu"
-            markup.add(InlineKeyboardButton("Last month", callback_data=last_month_journals),
+            markup.add(InlineKeyboardButton(get_last_month_button(), callback_data=get_last_month_callback()),
                        InlineKeyboardButton("Main Menu", callback_data=main_menu))
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                                   text=response,
@@ -185,14 +182,13 @@ def handle_query(call):
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                                   text="You dont have any journals yet. Feel free to add one by just sending a text or voice message.",
                                   reply_markup=markup)
-    elif split[0] == "show_journal_4":
+    elif split[0] == get_last_month_callback():
         response = get_weekly_entries(chat_id, 4)
         if response:
             markup = InlineKeyboardMarkup()
             markup.row_width = 2
-            last_week_journals = f"show_journal_1"
             main_menu = "main_menu"
-            markup.add(InlineKeyboardButton("Last week", callback_data=last_week_journals),
+            markup.add(InlineKeyboardButton(get_last_week_button(), callback_data=get_last_week_callback()),
                        InlineKeyboardButton("Main Menu", callback_data=main_menu))
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                                   text=response,

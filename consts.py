@@ -63,3 +63,23 @@ def get_cancel_text_save_button():
 
 def get_confirm_text_save_callback():
     return "confirm_text"
+
+
+def get_select_time_frame_text():
+    return "Choose a timeline to revisit your entries."
+
+
+def get_last_week_button():
+    return "🗓️ Last week"
+
+
+def get_last_month_button():
+    return "🗓️ Last month"
+
+
+def get_last_week_callback():
+    return "show_journal_1"
+
+
+def get_last_month_callback():
+    return "show_journal_4"
