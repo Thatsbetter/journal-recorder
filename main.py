@@ -24,13 +24,19 @@ logging.basicConfig(filename='error.log', level=logging.ERROR,
 transcriber = pipeline(model="openai/whisper-small")
 TOKEN = Credential().get_telegram_token()
 
+WEBHOOK_HOST = '134.122.70.253'
+WEBHOOK_PORT = 8443  # 443, 80, 88 or 8443 (port need to be 'open')
+WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
 
 WEBHOOK_SSL_CERT = './webhook_cert.pem'  # Path to the ssl certificate
 WEBHOOK_SSL_PRIV = './webhook_pkey.pem'  # Path to the ssl private key
-DOMAIN = '134.122.70.253'  # either domain, or ip address of vps
+WEBHOOK_URL_BASE = "https://%s:%s" % (WEBHOOK_HOST, WEBHOOK_PORT)
+WEBHOOK_URL_PATH = "/%s/" % (TOKEN)
+
 
 bot = telebot.TeleBot(TOKEN)
 init_db()
+app = flask.Flask(__name__)
 
 
 @app.route('/', methods=['GET', 'HEAD'])
@@ -332,8 +338,11 @@ scheduler.add_job(remind_users_to_journal, 'cron', day_of_week='*', hour=19, min
 scheduler.start()
 
 # Set webhook
-bot.run_webhooks(
-    listen=DOMAIN,
-    certificate=WEBHOOK_SSL_CERT,
-    certificate_key=WEBHOOK_SSL_PRIV
-)
+bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH,
+                certificate=open(WEBHOOK_SSL_CERT, 'r'))
+
+# Start flask server
+app.run(host=WEBHOOK_LISTEN,
+        port=WEBHOOK_PORT,
+        ssl_context=(WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV),
+        debug=True)
