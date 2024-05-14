@@ -108,3 +108,11 @@ def get_main_menu_button():
 
 def get_main_menu_callback():
     return "main_menu"
+
+
+def get_show_journal_button():
+    return "🗂️ View Journals"
+
+
+def get_show_journal_callback():
+    return "journals_markup"

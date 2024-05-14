@@ -151,7 +151,7 @@ def handle_query(call):
         # Notify user of cancellation
         bot.send_message(chat_id=chat_id,
                          text="Got it! It won´t be saved. \n You can try again.")
-    elif split[0] == "journals_markup":
+    elif split[0] == get_show_journal_callback():
         markup = InlineKeyboardMarkup()
         markup.row_width = 2
         markup.add(InlineKeyboardButton(get_last_week_button(), callback_data=get_last_week_callback()),
@@ -200,10 +200,9 @@ def handle_query(call):
     elif split[0] == get_main_menu_callback():
         markup = InlineKeyboardMarkup()
         markup.row_width = 2
-        journals_markup = "journals_markup"
         wordcloud_markup = "generate_wordcloud"
         why_journal = "why_journal"
-        markup.add(InlineKeyboardButton("🗂️ View Journals", callback_data=journals_markup),
+        markup.add(InlineKeyboardButton(get_show_journal_button(), callback_data=get_show_journal_callback()),
                    InlineKeyboardButton("☁️ Generate Word Cloud", callback_data=wordcloud_markup),
                    InlineKeyboardButton("🤔 Why Journal?", callback_data=why_journal))
         bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
@@ -247,8 +246,7 @@ def handle_query(call):
 
             markup = InlineKeyboardMarkup()
             markup.row_width = 2
-            journals_markup = "journals_markup"
-            markup.add(InlineKeyboardButton("See your Journals", callback_data=journals_markup),
+            markup.add(InlineKeyboardButton(get_show_journal_button(), callback_data=get_show_journal_callback()),
                        InlineKeyboardButton(get_main_menu_button(), callback_data=get_main_menu_callback()))
             # Respond to the user
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
@@ -277,8 +275,7 @@ def handle_query(call):
 
             markup = InlineKeyboardMarkup()
             markup.row_width = 2
-            journals_markup = f"journals_markup"
-            markup.add(InlineKeyboardButton("See your Journals", callback_data=journals_markup),
+            markup.add(InlineKeyboardButton(get_show_journal_button(), callback_data=get_show_journal_callback()),
                        InlineKeyboardButton(get_main_menu_button(), callback_data=get_main_menu_callback()))
             # Respond to the user
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
