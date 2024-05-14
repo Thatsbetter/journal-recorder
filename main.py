@@ -36,6 +36,7 @@ WEBHOOK_URL_PATH = "/%s/" % (TOKEN)
 
 bot = telebot.TeleBot(TOKEN)
 init_db()
+app = flask.Flask(__name__)
 
 
 @app.route('/', methods=['GET', 'HEAD'])
