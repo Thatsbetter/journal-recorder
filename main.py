@@ -330,7 +330,7 @@ scheduler.start()
 
 # Setup polling
 try:
-    bot.polling(none_stop=True, interval=0, timeout=20)
+    bot.infinity_polling(interval=0)
 except Exception as e:
     logging.error(f"Bot polling failed: {e}")
 finally:
