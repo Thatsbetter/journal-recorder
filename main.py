@@ -7,6 +7,7 @@ from tempfile import NamedTemporaryFile
 
 from apscheduler.schedulers.background import BackgroundScheduler
 import ffmpeg
+import flask
 import requests
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -23,10 +24,35 @@ logging.basicConfig(filename='error.log', level=logging.ERROR,
 transcriber = pipeline(model="openai/whisper-small")
 TOKEN = Credential().get_telegram_token()
 
+WEBHOOK_HOST = '134.122.70.253'
+WEBHOOK_PORT = 5000  # 443, 80, 88 or 8443 (port need to be 'open')
+WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
+
+WEBHOOK_SSL_CERT = './webhook_cert.pem'  # Path to the ssl certificate
+WEBHOOK_SSL_PRIV = './webhook_pkey.pem'  # Path to the ssl private key
+WEBHOOK_URL_BASE = "https://%s:%s" % (WEBHOOK_HOST, WEBHOOK_PORT)
+WEBHOOK_URL_PATH = "/%s/" % (TOKEN)
+
+
 bot = telebot.TeleBot(TOKEN)
 init_db()
 
 
+@app.route('/', methods=['GET', 'HEAD'])
+def index():
+    return ''
+
+
+# Process webhook calls
+@app.route(WEBHOOK_URL_PATH, methods=['POST'])
+def webhook():
+    if flask.request.headers.get('content-type') == 'application/json':
+        json_string = flask.request.get_data().decode('utf-8')
+        update = telebot.types.Update.de_json(json_string)
+        bot.process_new_updates([update])
+        return ''
+    else:
+        flask.abort(403)
 def remind_users_to_journal():
     try:
         chat_ids = get_all_chatids()
@@ -310,11 +336,12 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(remind_users_to_journal, 'cron', day_of_week='*', hour=19, minute=0)  # Run daily at 7:00 PM
 scheduler.start()
 
-# Setup polling
-try:
-    bot.infinity_polling(interval=0)
-except Exception as e:
-    logging.error(f"Bot polling failed: {e}")
-finally:
-    # This ensures that the scheduler is properly shut down when the polling loop is stopped
-    scheduler.shutdown()
+# Set webhook
+bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH,
+                certificate=open(WEBHOOK_SSL_CERT, 'r'))
+
+# Start flask server
+app.run(host=WEBHOOK_LISTEN,
+        port=WEBHOOK_PORT,
+        ssl_context=(WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV),
+        debug=True)
