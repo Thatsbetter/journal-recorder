@@ -113,14 +113,13 @@ def get_weekly_entries(chat_id, week=1):
 def handle_voice(message):
     markup = InlineKeyboardMarkup()
     markup.row_width = 2
-    confirm_save = f"{get_confirm_voice_save_callback()}:{message.message_id}"
-    cancel_save = get_cancel_callback()
+    confirm_save = f"{VoiceJournal.confirm_callback()}:{message.message_id}"
     save_file_id(message_id=message.message_id, file_id=message.voice.file_id)
-    markup.add(InlineKeyboardButton(get_confirm_save_button(), callback_data=confirm_save),
-               InlineKeyboardButton(get_cancel_voice_save_button(), callback_data=cancel_save))
+    markup.add(InlineKeyboardButton(TextJournal.confirm_button(), callback_data=confirm_save),
+               InlineKeyboardButton(VoiceJournal.cancel_button(), callback_data=TextJournal.cancel_callback()))
     bot.send_message(
         chat_id=message.chat.id,
-        text=get_confirm_voice_save_text(),
+        text=VoiceJournal.confirm_description(),
         reply_markup=markup,
         reply_to_message_id=message.message_id
     )
@@ -130,14 +129,13 @@ def handle_voice(message):
 def handle_text(message):
     markup = InlineKeyboardMarkup()
     markup.row_width = 2
-    confirm_save = f"{get_confirm_text_save_callback()}:{message.message_id}"
-    cancel_save = "cancel: "
+    confirm_save = f"{TextJournal.confirm_callback()}:{message.message_id}"
     save_text_id(message_id=message.message_id, text=message.text)
-    markup.add(InlineKeyboardButton(get_confirm_save_button(), callback_data=confirm_save),
-               InlineKeyboardButton(get_cancel_text_save_button(), callback_data=cancel_save))
+    markup.add(InlineKeyboardButton(TextJournal.confirm_button(), callback_data=confirm_save),
+               InlineKeyboardButton(TextJournal.cancel_button(), callback_data=TextJournal.cancel_callback()))
     bot.send_message(
         chat_id=message.chat.id,
-        text=get_confirm_text_save_text(),
+        text=TextJournal.confirm_description(),
         reply_markup=markup,
         reply_to_message_id=message.message_id
     )
@@ -147,81 +145,84 @@ def handle_text(message):
 def handle_query(call):
     split = call.data.split(":")
     chat_id = call.message.chat.id
-    if split[0] == get_cancel_callback():
+    if split[0] == TextJournal.cancel_callback():
         markup = InlineKeyboardMarkup()
         markup.row_width = 2
-        markup.add(InlineKeyboardButton(get_show_journal_button(), callback_data=get_show_journal_callback()),
-                   InlineKeyboardButton(get_main_menu_button(), callback_data=get_main_menu_callback()))
+        markup.add(InlineKeyboardButton(ShowJournal.button(), callback_data=ShowJournal.callback()),
+                   InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
         # Notify user of cancellation
         bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
-                              text=get_cancel_text(), reply_markup=markup)
-    elif split[0] == get_show_journal_callback():
+                              text=TextJournal.cancel_description(), reply_markup=markup)
+    elif split[0] == ShowJournal.callback():
         markup = InlineKeyboardMarkup()
         markup.row_width = 2
-        markup.add(InlineKeyboardButton(get_last_week_button(), callback_data=get_last_week_callback()),
-                   InlineKeyboardButton(get_last_month_button(), callback_data=get_last_month_callback()),
-                   InlineKeyboardButton(get_main_menu_button(), callback_data=get_main_menu_callback()))
+        markup.add(InlineKeyboardButton(ShowJournal.last_week_button(), callback_data=ShowJournal.last_week_callback()),
+                   InlineKeyboardButton(ShowJournal.last_month_button(),
+                                        callback_data=ShowJournal.last_month_callback()),
+                   InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
         # Respond to the user
-        bot.send_message(chat_id=chat_id,
-                         text=get_select_time_frame_text(),
-                         reply_markup=markup)
+        bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
+                              text=ShowJournal.description(),
+                              reply_markup=markup)
 
-    elif split[0] == get_last_week_callback():
+    elif split[0] == ShowJournal.last_week_callback():
         response = get_weekly_entries(chat_id)
         if response is not None:
             markup = InlineKeyboardMarkup()
             markup.row_width = 2
-            markup.add(InlineKeyboardButton(get_last_month_button(), callback_data=get_last_month_callback()),
-                       InlineKeyboardButton(get_main_menu_button(), callback_data=get_main_menu_callback()))
+            markup.add(
+                InlineKeyboardButton(ShowJournal.last_month_button(), callback_data=ShowJournal.last_month_callback()),
+                InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                                   text=response,
                                   reply_markup=markup)
         else:
             markup = InlineKeyboardMarkup()
             markup.row_width = 1
-            markup.add(InlineKeyboardButton(get_main_menu_button(), callback_data=get_main_menu_callback()))
+            markup.add(InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                                   text=get_no_entry_text(),
                                   reply_markup=markup)
-    elif split[0] == get_last_month_callback():
+    elif split[0] == ShowJournal.last_month_callback():
         response = get_weekly_entries(chat_id, 4)
         if response:
             markup = InlineKeyboardMarkup()
             markup.row_width = 2
-            markup.add(InlineKeyboardButton(get_last_week_button(), callback_data=get_last_week_callback()),
-                       InlineKeyboardButton(get_main_menu_button(), callback_data=get_main_menu_callback()))
+            markup.add(
+                InlineKeyboardButton(ShowJournal.last_week_button(), callback_data=ShowJournal.last_week_callback()),
+                InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                                   text=response,
                                   reply_markup=markup)
         else:
             markup = InlineKeyboardMarkup()
             markup.row_width = 1
-            markup.add(InlineKeyboardButton(get_main_menu_button(), callback_data=get_main_menu_callback()))
+            markup.add(InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                                   text=get_no_entry_text(),
                                   reply_markup=markup)
 
-    elif split[0] == get_main_menu_callback():
+    elif split[0] == MainMenu.callback():
         markup = InlineKeyboardMarkup()
         markup.row_width = 2
-        markup.add(InlineKeyboardButton(get_show_journal_button(), callback_data=get_show_journal_callback()),
-                   InlineKeyboardButton(get_wordcloud_button(), callback_data=get_wordcloud_callback()),
+        markup.add(InlineKeyboardButton(ShowJournal.button(), callback_data=ShowJournal.callback()),
+                   InlineKeyboardButton(WordCloud.button(), callback_data=WordCloud.callback()),
                    InlineKeyboardButton(WhyJournal.button(), callback_data=WhyJournal.callback()))
         bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
-                              text=description, reply_markup=markup, parse_mode='HTML')
+                              text=MainMenu.description(), reply_markup=markup, parse_mode='HTML')
 
-    elif split[0] == get_wordcloud_callback():
+    elif split[0] == WordCloud.callback():
         if is_journal_entry_more_than_10(chat_id):
             entries = fetch_journal_entries(chat_id)
             complete_text = " ".join([entry.text for entry in entries])
             word_counts = generate_word_frequencies(complete_text)
             img = create_word_cloud(word_counts)
-            bot.send_photo(chat_id=chat_id, photo=img, caption=get_wordcloud_description())
+            bot.send_photo(chat_id=chat_id, photo=img, caption=WordCloud.description())
             img.close()
         else:
             markup = InlineKeyboardMarkup()
             markup.row_width = 1
-            markup.add(InlineKeyboardButton(get_main_menu_button(), callback_data=get_main_menu_callback()))
+            markup.add(InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                                   text=response,
                                   reply_markup=markup)
@@ -229,11 +230,11 @@ def handle_query(call):
         markup = InlineKeyboardMarkup()
         markup.row_width = 1
         response = WhyJournal.description()
-        markup.add(InlineKeyboardButton(get_main_menu_button(), callback_data=get_main_menu_callback()))
+        markup.add(InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
         bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                               text=response, parse_mode='HTML',
                               reply_markup=markup)
-    elif split[0] == get_confirm_voice_save_callback():
+    elif split[0] == VoiceJournal.confirm_callback():
         try:
             file_id = get_file_id(message_id=split[1])
             # Process the audio after confirmation
@@ -247,12 +248,12 @@ def handle_query(call):
 
             markup = InlineKeyboardMarkup()
             markup.row_width = 2
-            markup.add(InlineKeyboardButton(get_show_journal_button(), callback_data=get_show_journal_callback()),
-                       InlineKeyboardButton(get_main_menu_button(), callback_data=get_main_menu_callback()))
+            markup.add(InlineKeyboardButton(ShowJournal.button(), callback_data=ShowJournal.callback()),
+                       InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
             # Respond to the user
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
-                             text=get_entry_saved_text(),
-                             reply_markup=markup)
+                                  text=TextJournal.save_description(),
+                                  reply_markup=markup)
             bot.set_message_reaction(chat_id=chat_id, message_id=split[1],
                                      reaction=[telebot.types.ReactionTypeEmoji("👍")])
             fetched_entries = fetch_journal_entries_by_week(chat_id, 16)
@@ -267,7 +268,7 @@ def handle_query(call):
         except Exception as e:
             logging.error(f"Error handling query: {str(e)}")
             bot.answer_callback_query(call.id, "Failed to save you journal.")
-    elif split[0] == get_confirm_text_save_callback():
+    elif split[0] == TextJournal.confirm_callback():
         try:
             text = get_text_id(message_id=split[1])
 
@@ -276,12 +277,12 @@ def handle_query(call):
 
             markup = InlineKeyboardMarkup()
             markup.row_width = 2
-            markup.add(InlineKeyboardButton(get_show_journal_button(), callback_data=get_show_journal_callback()),
-                       InlineKeyboardButton(get_main_menu_button(), callback_data=get_main_menu_callback()))
+            markup.add(InlineKeyboardButton(ShowJournal.button(), callback_data=ShowJournal.callback()),
+                       InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
             # Respond to the user
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
-                             text=get_entry_saved_text(),
-                             reply_markup=markup)
+                                  text=TextJournal.save_description(),
+                                  reply_markup=markup)
             bot.set_message_reaction(chat_id=chat_id, message_id=split[1],
                                      reaction=[telebot.types.ReactionTypeEmoji("👍")])
 
