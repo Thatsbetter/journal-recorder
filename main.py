@@ -109,6 +109,11 @@ def get_weekly_entries(chat_id, week=1):
         return None
 
 
+@bot.message_handler(commands=['start'])
+def send_word_cloud(message):
+    bot.send_message(chat_id=message.chat.id, text=MainMenu.description(), parse_mode='HTML')
+
+
 @bot.message_handler(content_types=['voice'])
 def handle_voice(message):
     markup = InlineKeyboardMarkup()
