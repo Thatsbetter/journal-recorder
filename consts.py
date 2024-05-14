@@ -83,3 +83,7 @@ def get_last_week_callback():
 
 def get_last_month_callback():
     return "show_journal_4"
+
+
+def get_no_entry_text():
+    return "No entries found for this time frame. Why not add one now? 📖✨"

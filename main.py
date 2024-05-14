@@ -180,7 +180,7 @@ def handle_query(call):
             main_menu = "main_menu"
             markup.add(InlineKeyboardButton("Main Menu", callback_data=main_menu))
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
-                                  text="You dont have any journals yet. Feel free to add one by just sending a text or voice message.",
+                                  text=get_no_entry_text(),
                                   reply_markup=markup)
     elif split[0] == get_last_month_callback():
         response = get_weekly_entries(chat_id, 4)
@@ -199,7 +199,7 @@ def handle_query(call):
             main_menu = "main_menu"
             markup.add(InlineKeyboardButton("Main Menu", callback_data=main_menu))
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
-                                  text="You dont have any journals yet. Feel free to add one by just sending a text or voice message.",
+                                  text=get_no_entry_text(),
                                   reply_markup=markup)
 
     elif split[0] == "main_menu":
