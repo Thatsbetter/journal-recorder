@@ -37,7 +37,7 @@ def get_confirm_voice_save_text():
     return " \nWould you like to save this voice message as a journal entry? \n \nFeel free to re-record if you’d like to adjust anything."
 
 
-def get_confirm_voice_save_button():
+def get_confirm_save_button():
     return "Yes, save it 📖"
 
 
@@ -51,3 +51,15 @@ def get_confirm_voice_save_callback():
 
 def get_cancel_callback():
     return "cancel"
+
+
+def get_confirm_text_save_text():
+    return "Would you like to add this text as a journal entry? \n \nFeel free to rewrite if you’d like to adjust your thoughts."
+
+
+def get_cancel_text_save_button():
+    return "No, write again 🔄"
+
+
+def get_confirm_text_save_callback():
+    return "confirm_text"

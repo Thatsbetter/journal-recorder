@@ -116,7 +116,7 @@ def handle_voice(message):
     confirm_save = f"{get_confirm_voice_save_callback()}:{message.message_id}"
     cancel_save = get_cancel_callback()
     save_file_id(message_id=message.message_id, file_id=message.voice.file_id)
-    markup.add(InlineKeyboardButton(get_confirm_voice_save_button(), callback_data=confirm_save),
+    markup.add(InlineKeyboardButton(get_confirm_save_button(), callback_data=confirm_save),
                InlineKeyboardButton(get_cancel_voice_save_button(), callback_data=cancel_save))
     bot.send_message(
         chat_id=message.chat.id,
@@ -130,14 +130,14 @@ def handle_voice(message):
 def handle_text(message):
     markup = InlineKeyboardMarkup()
     markup.row_width = 2
-    confirm_save = f"confirm_text:{message.message_id}"
+    confirm_save = f"{get_confirm_text_save_callback()}:{message.message_id}"
     cancel_save = "cancel: "
     save_text_id(message_id=message.message_id, text=message.text)
-    markup.add(InlineKeyboardButton("Yes", callback_data=confirm_save),
-               InlineKeyboardButton("No, I wanna try again", callback_data=cancel_save))
+    markup.add(InlineKeyboardButton(get_confirm_save_button(), callback_data=confirm_save),
+               InlineKeyboardButton(get_cancel_text_save_button(), callback_data=cancel_save))
     bot.send_message(
         chat_id=message.chat.id,
-        text="Do you want to add this text to your journal?",
+        text=get_confirm_text_save_text(),
         reply_markup=markup,
         reply_to_message_id=message.message_id
     )
@@ -289,7 +289,7 @@ def handle_query(call):
         except Exception as e:
             logging.error(f"Error handling query: {str(e)}")
             bot.answer_callback_query(call.id, "Failed to save you journal.")
-    elif split[0] == "confirm_text":
+    elif split[0] == get_confirm_text_save_callback():
         try:
             text = get_text_id(message_id=split[1])
 
