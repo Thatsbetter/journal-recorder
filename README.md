@@ -7,6 +7,8 @@ such as automatic transcription of voice messages, weekly reminders, word cloud 
 journal entries using advanced machine learning techniques.
 Inspiration: The need for a digital journal bot that leverages natural language processing (NLP).
 
+Link to the Bot: https://t.me/JournalCompanionBot
+
 ## Features
 
 - Voice Message Transcription: Convert voice messages to text using the OpenAI Whisper model.
