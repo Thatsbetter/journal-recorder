@@ -227,8 +227,8 @@ def handle_query(call):
             markup.row_width = 1
             markup.add(InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
-                                  text=response,
-                                  reply_markup=markup)
+                                  text=WordCloud.not_enough_entries(), reply_markup=markup)
+            bot.answer_callback_query(call.id, None)
     elif split[0] == WhyJournal.callback():
         markup = InlineKeyboardMarkup()
         markup.row_width = 1
