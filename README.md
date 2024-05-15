@@ -4,7 +4,8 @@
 
 The Telegram Journal Bot allows users to maintain a journal using either text or voice messages. The bot offers features
 such as automatic transcription of voice messages, weekly reminders, word cloud generation, and detection of similar
-journal entries using advanced machine learning techniques.
+journal entries using advanced machine learning techniques.<br>
+
 Inspiration: The need for a digital journal bot that leverages natural language processing (NLP).
 
 Link to the Bot: https://t.me/JournalCompanionBot
