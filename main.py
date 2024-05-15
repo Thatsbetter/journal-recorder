@@ -110,8 +110,9 @@ def get_weekly_entries(chat_id, week=1):
 
 
 @bot.message_handler(commands=['start'])
-def send_word_cloud(message):
-    bot.send_message(chat_id=message.chat.id, text=MainMenu.description(), parse_mode='HTML')
+def handle_welcome(message):
+    markup = create_main_menu_markup()
+    bot.send_message(chat_id=message.chat.id, reply_markup=markup, text=MainMenu.description(), parse_mode='HTML')
 
 
 @bot.message_handler(content_types=['voice'])
@@ -208,11 +209,7 @@ def handle_query(call):
                                   reply_markup=markup)
 
     elif split[0] == MainMenu.callback():
-        markup = InlineKeyboardMarkup()
-        markup.row_width = 2
-        markup.add(InlineKeyboardButton(ShowJournal.button(), callback_data=ShowJournal.callback()),
-                   InlineKeyboardButton(WordCloud.button(), callback_data=WordCloud.callback()),
-                   InlineKeyboardButton(WhyJournal.button(), callback_data=WhyJournal.callback()))
+        markup = create_main_menu_markup()
         bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                               text=MainMenu.description(), reply_markup=markup, parse_mode='HTML')
 
@@ -303,6 +300,15 @@ def handle_query(call):
         except Exception as e:
             logging.error(f"Error handling query: {str(e)}")
             bot.answer_callback_query(call.id, "Failed to save you journal.")
+
+
+def create_main_menu_markup():
+    markup = InlineKeyboardMarkup()
+    markup.row_width = 2
+    markup.add(InlineKeyboardButton(ShowJournal.button(), callback_data=ShowJournal.callback()),
+               InlineKeyboardButton(WordCloud.button(), callback_data=WordCloud.callback()),
+               InlineKeyboardButton(WhyJournal.button(), callback_data=WhyJournal.callback()))
+    return markup
 
 
 # Initialize scheduler
