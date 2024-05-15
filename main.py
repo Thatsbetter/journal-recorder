@@ -157,6 +157,7 @@ def handle_query(call):
         markup.add(InlineKeyboardButton(ShowJournal.button(), callback_data=ShowJournal.callback()),
                    InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
         # Notify user of cancellation
+        bot.answer_callback_query(call.id, None)
         bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                               text=TextJournal.cancel_description(), reply_markup=markup)
     elif split[0] == ShowJournal.callback():
@@ -167,6 +168,7 @@ def handle_query(call):
                                         callback_data=ShowJournal.last_month_callback()),
                    InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
         # Respond to the user
+        bot.answer_callback_query(call.id, None)
         bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                               text=ShowJournal.description(),
                               reply_markup=markup)
@@ -179,6 +181,7 @@ def handle_query(call):
             markup.add(
                 InlineKeyboardButton(ShowJournal.last_month_button(), callback_data=ShowJournal.last_month_callback()),
                 InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
+            bot.answer_callback_query(call.id, None)
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                                   text=response,
                                   reply_markup=markup)
@@ -186,6 +189,7 @@ def handle_query(call):
             markup = InlineKeyboardMarkup()
             markup.row_width = 1
             markup.add(InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
+            bot.answer_callback_query(call.id, None)
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                                   text=get_no_entry_text(),
                                   reply_markup=markup)
@@ -197,6 +201,7 @@ def handle_query(call):
             markup.add(
                 InlineKeyboardButton(ShowJournal.last_week_button(), callback_data=ShowJournal.last_week_callback()),
                 InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
+            bot.answer_callback_query(call.id, None)
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                                   text=response,
                                   reply_markup=markup)
@@ -204,12 +209,14 @@ def handle_query(call):
             markup = InlineKeyboardMarkup()
             markup.row_width = 1
             markup.add(InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
+            bot.answer_callback_query(call.id, None)
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                                   text=get_no_entry_text(),
                                   reply_markup=markup)
 
     elif split[0] == MainMenu.callback():
         markup = create_main_menu_markup()
+        bot.answer_callback_query(call.id, None)
         bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                               text=MainMenu.description(), reply_markup=markup, parse_mode='HTML')
 
@@ -221,6 +228,7 @@ def handle_query(call):
             word_counts = generate_word_frequencies(complete_text)
             img = create_word_cloud(word_counts)
             bot.send_photo(chat_id=chat_id, photo=img, caption=WordCloud.description())
+            bot.answer_callback_query(call.id, None)
             img.close()
         else:
             markup = InlineKeyboardMarkup()
@@ -237,6 +245,7 @@ def handle_query(call):
         bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                               text=response, parse_mode='HTML',
                               reply_markup=markup)
+        bot.answer_callback_query(call.id, None)
     elif split[0] == VoiceJournal.confirm_callback():
         try:
             bot.send_chat_action(chat_id, 'typing')
@@ -260,6 +269,7 @@ def handle_query(call):
                                   reply_markup=markup)
             bot.set_message_reaction(chat_id=chat_id, message_id=split[1],
                                      reaction=[telebot.types.ReactionTypeEmoji("👍")])
+            bot.answer_callback_query(call.id, None)
             fetched_entries = fetch_journal_entries_by_week(chat_id, 16)
             if fetched_entries:
                 similar_entries = find_similar_journal_entries(fetched_entries)
@@ -289,7 +299,7 @@ def handle_query(call):
                                   reply_markup=markup)
             bot.set_message_reaction(chat_id=chat_id, message_id=split[1],
                                      reaction=[telebot.types.ReactionTypeEmoji("👍")])
-
+            bot.answer_callback_query(call.id, None)
             fetched_entries = fetch_journal_entries_by_week(chat_id, 16)
             if fetched_entries:
                 similar_entries = find_similar_journal_entries(fetched_entries)
