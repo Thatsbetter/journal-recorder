@@ -23,9 +23,10 @@ Link to the Bot: https://t.me/JournalCompanionBot
 
 1. Clone the repository:
 
-sh
+```sh
 git clone https://github.com/Thatsbetter/journal-recorder
 cd journal-recorder
+``` 
 
 2. Install required packages:
 
