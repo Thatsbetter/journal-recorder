@@ -100,8 +100,8 @@ def fetch_journal_entries_by_week(chat_id, weeks=1):
     return [(entry.text, entry.timestamp) for entry in entries]
 
 
-def get_weekly_entries(chat_id, week=1):
-    entries = fetch_journal_entries_by_week(chat_id)
+def get_weekly_entries(chat_id, weeks=1):
+    entries = fetch_journal_entries_by_week(chat_id, weeks)
     if entries:
         response = "\n\n".join([f"{entry[1].strftime('%Y-%m-%d %H:%M:%S')}: {entry[0]}" for entry in entries])
         return response
