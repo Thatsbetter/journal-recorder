@@ -215,6 +215,7 @@ def handle_query(call):
 
     elif split[0] == WordCloud.callback():
         if is_journal_entry_more_than_10(chat_id):
+            bot.send_chat_action(chat_id, 'upload_photo')
             entries = fetch_journal_entries(chat_id)
             complete_text = " ".join([entry.text for entry in entries])
             word_counts = generate_word_frequencies(complete_text)
@@ -238,6 +239,7 @@ def handle_query(call):
                               reply_markup=markup)
     elif split[0] == VoiceJournal.confirm_callback():
         try:
+            bot.send_chat_action(chat_id, 'typing')
             file_id = get_file_id(message_id=split[1])
             # Process the audio after confirmation
             path_to_mp3 = save_and_convert_audio(file_id=file_id)
