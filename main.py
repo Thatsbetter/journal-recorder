@@ -25,7 +25,7 @@ transcriber = pipeline(model="openai/whisper-small")
 TOKEN = Credential().get_telegram_token()
 
 WEBHOOK_HOST = Credential().get_ip_address()
-WEBHOOK_PORT = 80  # 443, 80, 88 or 8443 (port need to be 'open')
+WEBHOOK_PORT = 443  # 443, 80, 88 or 8443 (port need to be 'open')
 WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
 
 WEBHOOK_URL_BASE = "https://%s:%s" % (WEBHOOK_HOST, WEBHOOK_PORT)
