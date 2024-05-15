@@ -30,8 +30,9 @@ cd journal-recorder
 
 2. Install required packages:
 
-sh
+```sh
 pip install -r requirements.txt
+``` 
 
 3. Setup Database:
     - Ensure you have a PostgreSQL database or any other supported database.
