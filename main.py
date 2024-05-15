@@ -7,6 +7,7 @@ from tempfile import NamedTemporaryFile
 
 from apscheduler.schedulers.background import BackgroundScheduler
 import ffmpeg
+import flask
 import requests
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -23,13 +24,36 @@ logging.basicConfig(filename='error.log', level=logging.ERROR,
 transcriber = pipeline(model="openai/whisper-small")
 TOKEN = Credential().get_telegram_token()
 
+WEBHOOK_HOST = Credential().get_ip_address()
+WEBHOOK_PORT = 80  # 443, 80, 88 or 8443 (port need to be 'open')
+WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
+
+WEBHOOK_URL_BASE = "https://%s:%s" % (WEBHOOK_HOST, WEBHOOK_PORT)
+WEBHOOK_URL_PATH = "/%s/" % (TOKEN)
+
+
 WEBHOOK_SSL_CERT = 'webhook_cert.pem'  # Path to the ssl certificate
 WEBHOOK_SSL_PRIV = 'webhook_pkey.pem'  # Path to the ssl private key
-DOMAIN = Credential().get_ip_address()  # either domain, or ip address of vps
 bot = telebot.TeleBot(TOKEN)
 init_db()
+app = flask.Flask(__name__)
 
 
+@app.route('/', methods=['GET', 'HEAD'])
+def index():
+    return ''
+
+
+# Process webhook calls
+@app.route(WEBHOOK_URL_PATH, methods=['POST'])
+def webhook():
+    if flask.request.headers.get('content-type') == 'application/json':
+        json_string = flask.request.get_data().decode('utf-8')
+        update = telebot.types.Update.de_json(json_string)
+        bot.process_new_updates([update])
+        return ''
+    else:
+        flask.abort(403)
 def remind_users_to_journal():
     try:
         chat_ids = get_all_chatids()
@@ -313,13 +337,16 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(remind_users_to_journal, 'cron', day_of_week='*', hour=19, minute=0)  # Run daily at 7:00 PM
 scheduler.start()
 
-# Setup webhook
+# Set webhook
+bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH,
+                certificate=open(WEBHOOK_SSL_CERT, 'r'))
+
+
 try:
-    bot.run_webhooks(
-        listen=DOMAIN,
-        certificate=WEBHOOK_SSL_CERT,
-        certificate_key=WEBHOOK_SSL_PRIV
-    )
+    app.run(host=WEBHOOK_LISTEN,
+            port=WEBHOOK_PORT,
+            ssl_context=(WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV),
+            debug=True)
 except Exception as e:
     logging.error(f"Bot polling failed: {e}")
 finally:
