@@ -124,7 +124,7 @@ class MainMenu:
             "- <b>Word Cloud:</b> See a visual of your most used words.\n"
             "- <b>View Your Journals:</b> Review entries or generate a word cloud.\n"
             "- <b>Discover Similar Entries:</b> Identify insights into recurring thoughts.\n\n"
-            "Tap an option below or just send a text or voice message to begin journaling! 📝"
+            "just send a text or voice message to begin journaling! 📝"
         )
         return description
 
