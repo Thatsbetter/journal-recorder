@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import create_engine, Column, Integer, Text, DateTime
+from sqlalchemy import create_engine, Column, Integer, Text, DateTime, BigInteger
 from sqlalchemy.ext.declarative import declarative_base
 
 from credential import Credential
