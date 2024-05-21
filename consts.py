@@ -109,9 +109,7 @@ class VoiceJournal:
 
     @staticmethod
     def save_description():
-        return """Your thoughts have been saved! 🌟
-
-        Ready to revisit some memories? Just tap the buttons below to explore your previous entries. Enjoy the journey back! ✨"""
+        return "Your thoughts have been saved! 🌟\n\nReady to revisit some memories? Just tap the buttons below to explore your previous entries. Enjoy the journey back! ✨"
 
 
 class MainMenu:
