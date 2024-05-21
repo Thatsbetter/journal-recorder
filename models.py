@@ -12,7 +12,7 @@ engine = create_engine(Credential().get_conn_uri())
 class JournalEntry(Base):
     __tablename__ = 'journal_entries'
     id = Column(Integer, primary_key=True)
-    chat_id = Column(Integer, nullable=False)
+    chat_id = Column(BigInteger, nullable=False)
     text = Column(Text, nullable=False)
     timestamp = Column(DateTime, default=datetime.utcnow)
 
