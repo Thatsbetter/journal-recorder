@@ -121,8 +121,8 @@ def handle_voice(message):
     markup.row_width = 2
     confirm_save = f"{VoiceJournal.confirm_callback()}:{message.message_id}"
     save_file_id(message_id=message.message_id, file_id=message.voice.file_id)
-    markup.add(InlineKeyboardButton(TextJournal.confirm_button(), callback_data=confirm_save),
-               InlineKeyboardButton(VoiceJournal.cancel_button(), callback_data=TextJournal.cancel_callback()))
+    markup.add(InlineKeyboardButton(VoiceJournal.confirm_button(), callback_data=confirm_save),
+               InlineKeyboardButton(VoiceJournal.cancel_button(), callback_data=VoiceJournal.cancel_callback()))
     bot.send_message(
         chat_id=message.chat.id,
         text=VoiceJournal.confirm_description(),
@@ -191,7 +191,7 @@ def handle_query(call):
             markup.add(InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
             bot.answer_callback_query(call.id, None)
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
-                                  text=get_no_entry_text(),
+                                  text=ShowJournal.no_entry_text(),
                                   reply_markup=markup)
     elif split[0] == ShowJournal.last_month_callback():
         response = get_weekly_entries(chat_id, 4)
@@ -211,7 +211,7 @@ def handle_query(call):
             markup.add(InlineKeyboardButton(MainMenu.button(), callback_data=MainMenu.callback()))
             bot.answer_callback_query(call.id, None)
             bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
-                                  text=get_no_entry_text(),
+                                  text=ShowJournal.no_entry_text(),
                                   reply_markup=markup)
 
     elif split[0] == MainMenu.callback():
