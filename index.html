@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Journaling Assistant</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #fbeee5;
+            color: #4A4A4A;
+        }
+
+        .header-logo {
+            font-family: 'Playfair Display', serif;
+            color: #87CEEB;
+            font-size: 24px;
+        }
+
+        .main-heading {
+            font-family: 'Playfair Display', serif;
+            color: #87CEEB;
+        }
+
+        .subheading {
+            font-family: 'Open Sans', sans-serif;
+            color: #4A4A4A;
+        }
+
+        .cta-btn {
+            background-color: #00796b; /* Updated color */
+            color: white;
+            border-radius: 25px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .cta-btn:hover {
+            background-color: #005f56; /* Darker teal for hover effect */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-heading {
+            font-family: 'Playfair Display', serif;
+            color: #87CEEB;
+        }
+
+        .feature-icon, .how-it-works-icon {
+            font-size: 48px;
+            color: #FFD700;
+        }
+
+        .contact-form input, .contact-form textarea {
+            border-radius: 10px;
+            background-color: #F5F5F5;
+        }
+
+        .footer {
+            background-color: #F5F5F5;
+            padding: 20px;
+        }
+
+        .social-icons a {
+            color: #87CEEB;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header Section -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <a class="navbar-brand header-logo" href="#">Digital Journaling Assistant</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#features">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#how-it-works">How It Works</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#contact">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero text-center py-5">
+    <div class="container d-flex align-items-center">
+        <div class="text-left mr-5">
+            <h1 class="main-heading">📘 Welcome to Your Digital Journaling Assistant! 📘</h1>
+            <p class="subheading">Start journaling anytime by sending a text or voice message.</p>
+            <a href="https://t.me/JournalCompanionBot" class="btn cta-btn btn-lg mt-3">Start Journaling on Telegram</a>
+        </div>
+        <div>
+            <!-- Placeholder for Main Illustration -->
+            <img src="journal-hero-2.jpeg" alt="Hero Illustration" class="img-fluid">
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="text-center py-5">
+    <div class="container">
+        <h2 class="section-heading">Why Choose Our Journaling Assistant?</h2>
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="feature-icon mb-3">📝</div>
+                <h4>Word Cloud Visualization</h4>
+                <p>See a visual of your most used words.</p>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-icon mb-3">📒</div>
+                <h4>View Your Journals</h4>
+                <p>Review entries or generate a word cloud.</p>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-icon mb-3">🔍</div>
+                <h4>Discover Similar Entries</h4>
+                <p>Identify insights into recurring thoughts.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="text-center py-5 bg-light">
+    <div class="container">
+        <h2 class="section-heading">How It Works</h2>
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="how-it-works-icon mb-3">📩</div>
+                <h4>Send a text or voice message</h4>
+                <p>Start journaling by simply sending a message.</p>
+            </div>
+            <div class="col-md-4">
+                <div class="how-it-works-icon mb-3">📁</div>
+                <h4>View your journal entries</h4>
+                <p>Access and review your journal entries anytime.</p>
+            </div>
+            <div class="col-md-4">
+                <div class="how-it-works-icon mb-3">🔍</div>
+                <h4>Generate word clouds</h4>
+                <p>Discover recurring themes and insights.</p>
+            </div>
+        </div>
+        <!-- Placeholder for Screenshots -->
+        <img src="img/screenshots-placeholder.png" alt="Screenshots Placeholder" class="img-fluid mt-4">
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="text-center py-5">
+    <div class="container">
+        <h2 class="section-heading">Get in Touch</h2>
+        <form class="contact-form mt-4">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <input type="text" class="form-control" placeholder="Name">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <input type="email" class="form-control" placeholder="Email">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <textarea class="form-control" rows="5" placeholder="Message"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn cta-btn">Send Message</button>
+        </form>
+        <div class="social-icons mt-4">
+            <a href="#" class="btn btn-link">Telegram</a>
+            <a href="#" class="btn btn-link">Facebook</a>
+            <a href="#" class="btn btn-link">Twitter</a>
+            <a href="#" class="btn btn-link">Instagram</a>
+        </div>
+    </div>
+</section>
+
+<!-- Footer Section -->
+<footer class="footer text-center py-3">
+    <div class="container">
+        <p>&copy; 2023 Digital Journaling Assistant. All rights reserved.</p>
+        <p><a href="#">About</a> | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+    </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
