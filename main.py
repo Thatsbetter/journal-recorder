@@ -20,7 +20,6 @@ from text_processing import generate_word_frequencies, create_word_cloud, find_s
 
 logging.basicConfig(filename='error.log', level=logging.ERROR,
                     format='%(asctime)s:%(levelname)s:%(message)s')
-transcriber = pipeline(model="openai/whisper-small")
 TOKEN = Credential().get_telegram_token()
 
 bot = telebot.TeleBot(TOKEN)
@@ -90,6 +89,7 @@ def save_and_convert_audio(file_id):
 
 def transcribe_audio(path_to_audio):
     # Use Whisper to transcribe the audio
+    transcriber = pipeline(model="openai/whisper-small")
     transcription = transcriber(path_to_audio)
     return transcription['text']
 
