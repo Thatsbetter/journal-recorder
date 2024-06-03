@@ -1,3 +1,5 @@
+import random
+
 class WhyJournal:
 
     @staticmethod
@@ -170,7 +172,16 @@ class ShowJournal:
 
 
 def get_remind_journal_text():
-    return """"Hello! 🌟 It's been a couple of days since your last journal entry 📖✍️ \nWhy not take a moment now to share your thoughts or a special moment from your day?"""
+    messages = [
+        "Hello! 🌟 It's been a couple of days since your last journal note 📖✍️ \nWhy not take a moment now to share your thoughts or a special moment from your day?",
+        "🌞 Hello there! It's been a few days since your last journal note 📔✨. How about capturing a thought or memory from today? 🌸",
+        "👋 Hi! We've missed your journaling vibes. It's been a little while since your last note 📒. Ready to unload your mind and jot down anything on your mind? 💭",
+        "🌟 Hey! We noticed it's been a while since you last checked in 📓. How about taking a brief moment to write down things that stood out for you today? 🌻",
+        "🌈 Hi there! Your journal is waiting to hear from you 📘. It's been some time since your last note - why not take a moment to reflect and jot something down? 🌿",
+        "💫 Hey! It's been a few days since you last visited your journal 📙. Why not take a minute to jot down how you’re feeling or a memorable moment? 💖",
+        "🧡 Hello! It’s been a little while since your last journal post 📖. How about reflecting on your day and sharing your thoughts? ✨"
+    ]
+    return random.choice(messages)
 
 
 def get_similar_thoughts_text():
